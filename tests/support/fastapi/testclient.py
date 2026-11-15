@@ -48,6 +48,7 @@ class TestClient:
         return _Resp(resp.status_code, {k.lower(): v for k, v in resp.headers.items()}, data)
 
     def get(self, url, **k): return self.request("GET", url, **k)
+    def head(self, url, **k): return self.request("HEAD", url, **k)
     def post(self, url, **k): return self.request("POST", url, **k)
     def patch(self, url, **k): return self.request("PATCH", url, **k)
     def delete(self, url, **k): return self.request("DELETE", url, **k)

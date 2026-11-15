@@ -57,6 +57,7 @@ FIXTURE_SOURCES = [
 
 async def run_demo() -> dict:
     tests = await run_python_tests(CODE, TESTS)
+    blocked = bool(tests.get("blocked"))
     comp = compress_sources(FIXTURE_SOURCES, "AcmeSDK latest stable version connect open_session", budget_tokens=120)
     drift = detect_version_drift(CLAIM, FIXTURE_SOURCES)
     sources = [{**s, "trust": source_trust(s["url"])} for s in FIXTURE_SOURCES]
@@ -64,13 +65,17 @@ async def run_demo() -> dict:
     return {
         "mode": "demo",
         "notice": ("DEMO FIXTURE — no Bifrost inference or Tavily live search was performed. The search results and the code are fixtures "
-                   "for a fictional SDK; evidence compression, version-drift detection and the pytest run below are real, executed just now."),
+                   "for a fictional SDK; evidence compression and version-drift detection below are real, executed just now. "
+                   + ("The pytest run was NOT executed because code execution is disabled on this deployment." if blocked
+                      else "The pytest run below is also real, executed just now.")),
         "workflow_id": "freshcode-demo-002",
         "pipeline": [
             {"stage": "research", "state": "done", "message": "Loaded 3 fixture search results (not a live search)."},
             {"stage": "optimize", "state": "done", "message": f"REAL compression: {comp['original_tokens']} → {comp['compressed_tokens']} est. tokens, {comp['dropped_duplicates']} duplicate source dropped."},
             {"stage": "generate", "state": "done", "message": "Loaded a deterministic sample implementation (not an LLM response)."},
-            {"stage": "test", "state": "done" if tests.get("passed") else "error", "message": f"REAL pytest run: {tests.get('tests_passed', 0)} passed, {tests.get('tests_failed', 0)} failed."},
+            ({"stage": "test", "state": "skipped", "message": "Test run skipped: code execution is disabled on this deployment. Nothing failed. Run the app locally to see real pytest results."}
+             if blocked else
+             {"stage": "test", "state": "done" if tests.get("passed") else "error", "message": f"REAL pytest run: {tests.get('tests_passed', 0)} passed, {tests.get('tests_failed', 0)} failed."}),
         ],
         "coding": {"language": "python", "task": "Normalize email addresses and reject malformed inputs.", "code": CODE,
                    "answer": "Deterministic sample: trims whitespace, lowercases local part and domain, rejects malformed input.",

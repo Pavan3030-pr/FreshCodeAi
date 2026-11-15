@@ -57,6 +57,13 @@ class _Routes:
     def delete(self, p, **k): return self._reg("DELETE")(p, **k)
     def put(self, p, **k): return self._reg("PUT")(p, **k)
 
+    def api_route(self, p, methods=("GET",), **k):
+        def deco(fn):
+            for m in methods:
+                self.routes.append((m.upper(), p, fn))
+            return fn
+        return deco
+
 
 class APIRouter(_Routes):
     def __init__(self, prefix=""):

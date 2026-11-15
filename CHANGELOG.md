@@ -7,6 +7,7 @@
 **Pages:** landing page rebuilt (workflow, Bifrost, Tavily, compression, verification, freshness, evidence, security, architecture, FAQ) with a real product screenshot; sign-in / sign-up redesigned with password-strength feedback.
 **Tests:** light-only, palette, workspace-structure and highlighter / stage-derivation tests added; dark-theme tests removed because the feature was removed.
 **Fixes (CI / startup):** dependency pins no longer conflict (`fastapi` 0.115 required `starlette<0.47` while `starlette>=0.47.2` was requested, so `pip install` failed); `post_json` now returns `(body, headers)` as its callers expect, no longer turns 4xx errors into retryable 500s, and retries are counted as extra attempts; freshness test fakes accept the routed `model` argument; `venv/` is git-ignored.
+**Fixes (demo / probes):** the guest demo now reports a disabled runner as skipped ("Blocked") instead of a failed test run, and its notice no longer claims pytest was executed; the `/`, `/login` and `/app` pages answer HEAD requests (uptime monitors previously got HTTP 405).
 
 ## v5.0.0 — AI engineering reliability platform
 **Accounts and isolation:** registration/sign-in with scrypt, HttpOnly session cookie, per-session CSRF token, login throttling, sliding+absolute session expiry, session list/revoke, password change, account deletion; every query on user data is scoped by user; first account is admin.

@@ -62,6 +62,12 @@ def test_pages_and_security_headers():
     assert c.get("/static/../app/config.py").status_code in (404, 403)
 
 
+def test_page_routes_accept_head_requests():
+    c = fresh()
+    for path in ("/", "/login", "/app"):
+        assert c.head(path).status_code == 200, path
+
+
 def test_eval_and_demo_are_public():
     c = fresh()
     assert c.get("/api/v1/eval").json()["drift_detector"]["cases"] >= 15

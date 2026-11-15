@@ -88,12 +88,12 @@ def _page(name: str) -> HTMLResponse:
     return HTMLResponse((BASE / "static" / name).read_text(encoding="utf-8"), headers={"Cache-Control": "no-cache"})
 
 
-@app.get("/", response_class=HTMLResponse)
+@app.api_route("/", methods=["GET", "HEAD"], response_class=HTMLResponse)
 async def landing():
     return _page("landing.html")
 
 
-@app.get("/login", response_class=HTMLResponse)
+@app.api_route("/login", methods=["GET", "HEAD"], response_class=HTMLResponse)
 async def login_page():
     return _page("login.html")
 
@@ -103,6 +103,6 @@ async def signup_page():
     return RedirectResponse("/login#signup")
 
 
-@app.get("/app", response_class=HTMLResponse)
+@app.api_route("/app", methods=["GET", "HEAD"], response_class=HTMLResponse)
 async def workspace():
     return _page("index.html")

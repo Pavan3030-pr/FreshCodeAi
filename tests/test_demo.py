@@ -34,3 +34,17 @@ def test_demo_is_honest_and_real_parts_are_real():
     drift = d["verification"]["claims"][0]["version_drift"]
     assert drift["status"] == "newer_version_found" and drift["newer_version"] == "2.7.1"
     assert d["benchmark"]["measured"] is False and d["benchmark"]["token_savings_percent"] is None
+
+
+def test_demo_reports_blocked_runner_honestly():
+    import app.services.runner as runner
+    original = runner.settings
+    import dataclasses
+    runner.settings = dataclasses.replace(original, runner_mode="off")
+    try:
+        d = asyncio.run(run_demo())
+    finally:
+        runner.settings = original
+    test_stage = [p for p in d["pipeline"] if p["stage"] == "test"][0]
+    assert d["tests"]["blocked"] is True and test_stage["state"] == "skipped" and "Nothing failed" in test_stage["message"]
+    assert "NOT executed" in d["notice"]
