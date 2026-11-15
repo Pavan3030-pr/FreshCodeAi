@@ -30,34 +30,55 @@ def _env(name: str, default: str = "") -> str:
     return _clean(os.getenv(name, default))
 
 
-def _int(name: str, default: int, lo: int, hi: int) -> int:
+def _int(name: str, default: int, min_val: int = None, max_val: int = None) -> int:
+    raw = os.getenv(name, None)
+    if raw is None or _clean(raw) == "":
+        return default
     try:
-        value = int(_env(name, str(default)))
+        val = int(_clean(raw))
     except ValueError:
-        value = default
-    return max(lo, min(hi, value))
+        return default
+    if min_val is not None and val < min_val:
+        return min_val
+    if max_val is not None and val > max_val:
+        return max_val
+    return val
 
 
-def _float(name: str, default: float, lo: float, hi: float) -> float:
+def _float(name: str, default: float, min_val: float = None, max_val: float = None) -> float:
+    raw = os.getenv(name, None)
+    if raw is None or _clean(raw) == "":
+        return default
     try:
-        value = float(_env(name, str(default)))
+        val = float(_clean(raw))
     except ValueError:
-        value = default
-    return max(lo, min(hi, value))
+        return default
+    if min_val is not None and val < min_val:
+        return min_val
+    if max_val is not None and val > max_val:
+        return max_val
+    return val
 
 
 def _bool(name: str, default: bool) -> bool:
-    raw = _env(name)
-    if not raw:
+    raw = os.getenv(name, None)
+    if raw is None or _clean(raw) == "":
         return default
-    return raw.lower() in {"1", "true", "yes", "on"}
+    cleaned = _clean(raw).lower()
+    if cleaned in ("true", "1", "yes", "on"):
+        return True
+    if cleaned in ("false", "0", "no", "off"):
+        return False
+    return default
 
 
 _APP_ENV = _env("APP_ENV", "development").lower()
 
 
 def _normalize_bifrost_base_url(url: str) -> str:
-    url = url.rstrip("/")
+    url = (url or "").strip().rstrip("/")
+    if not url:
+        return "https://api.groq.com/openai/v1"
     if "groq.com" in url and not url.endswith("/openai/v1"):
         return "https://api.groq.com/openai/v1"
     return url
@@ -71,7 +92,7 @@ class Settings:
     log_level: str = _env("LOG_LEVEL", "INFO")
     secret_key: str = _env("SECRET_KEY", "dev-secret-key")
     cors_origins: str = _env("CORS_ORIGINS", "*")
-    bifrost_base_url: str = _normalize_bifrost_base_url(_env("BIFROST_BASE_URL", "http://localhost:4000/v1"))
+    bifrost_base_url: str = _normalize_bifrost_base_url(_env("BIFROST_BASE_URL", "https://api.groq.com/openai/v1"))
     bifrost_api_key: str = _env("BIFROST_API_KEY")
     bifrost_model: str = _env("BIFROST_MODEL", "general")
     bifrost_fast_model: str = _env("BIFROST_FAST_MODEL")
@@ -99,12 +120,12 @@ class Settings:
     runner_timeout_seconds: int = _int("RUNNER_TIMEOUT_SECONDS", 8, 2, 60)
     # Accounts and sessions
     allow_registration: bool = _bool("ALLOW_REGISTRATION", True)
-    session_ttl_hours: int = _int("SESSION_TTL_HOURS", 12, 1, 720)        # sliding idle lifetime
-    session_max_days: int = _int("SESSION_MAX_DAYS", 7, 1, 90)           # absolute lifetime
+    session_ttl_hours: int = _int("SESSION_TTL_HOURS", 12, 1, 720)  # sliding idle lifetime
+    session_max_days: int = _int("SESSION_MAX_DAYS", 7, 1, 90)  # absolute lifetime
     cookie_secure: bool = _bool("COOKIE_SECURE", _APP_ENV == "production")
     login_max_attempts: int = _int("LOGIN_MAX_ATTEMPTS", 5, 1, 100)
     login_window_minutes: int = _int("LOGIN_WINDOW_MINUTES", 15, 1, 1440)
-    daily_run_quota: int = _int("DAILY_RUN_QUOTA", 200, 1, 100000)        # per user, heavy runs per rolling 24h
+    daily_run_quota: int = _int("DAILY_RUN_QUOTA", 200, 1, 100000)  # per user, heavy runs per rolling 24h
     agent_timeout_seconds: int = _int("AGENT_TIMEOUT_SECONDS", 180, 10, 1800)
     # Code execution: off | local (AST policy + rlimits, NOT a sandbox) | docker (isolated container)
     runner_mode: str = _env("RUNNER_MODE", "").lower()
