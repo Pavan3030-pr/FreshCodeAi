@@ -67,13 +67,14 @@ class BifrostClient:
             "messages": [{"role": "system", "content": system_prompt}, {"role": "user", "content": user_prompt}],
         }
         timeout_val = getattr(settings, "bifrost_timeout", 120.0)
-        data = await post_json(
+        data, resp_headers = await post_json(
             "bifrost",
             f"{self.base_url}/chat/completions",
             payload=payload,
             headers={"Authorization": f"Bearer {self.api_key}"},
             timeout=timeout_val,
             transport=self.transport,
+            retries=self.retries,
         )
         choices = data.get("choices") or []
         if not choices:
@@ -84,7 +85,7 @@ class BifrostClient:
             "content": content,
             "usage": data.get("usage") or {},
             "model": data.get("model", model),
-            "request_id": data.get("id", ""),
+            "request_id": resp_headers.get("x-request-id") or data.get("id", ""),
             "cached": False,
         }
         if use_cache and content:

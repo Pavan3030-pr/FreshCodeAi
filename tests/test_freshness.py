@@ -109,7 +109,7 @@ def test_llm_evidence_assessor_can_return_verdict():
     class FakeLLM:
         configured = True
 
-        async def complete(self, system, user):
+        async def complete(self, system, user, **kwargs):
             return {"content": '[{"verdict":"supported","confidence":91,"reason":"Explicit.","supporting_source_indexes":[0],"contradicting_source_indexes":[]}]'}
 
     report = run(verify_text("The latest API version is 4.2.1.", FakeTavily(), FakeLLM()))
@@ -132,7 +132,7 @@ def test_assessment_source_indexes_are_bounded():
     class Assessor:
         configured = True
 
-        async def complete(self, system, user):
+        async def complete(self, system, user, **kwargs):
             return {"content": '[{"verdict":"supported","confidence":99,"reason":"ok","supporting_source_indexes":[0,99,-1],"contradicting_source_indexes":[]}]'}
 
     claim = run(verify_text("The latest API version is 4.2.1.", FakeTavily(), Assessor()))["claims"][0]
@@ -143,7 +143,7 @@ def test_supported_verdict_without_valid_citation_is_downgraded():
     class Uncited:
         configured = True
 
-        async def complete(self, system, user):
+        async def complete(self, system, user, **kwargs):
             return {"content": '[{"verdict":"supported","confidence":99,"reason":"Trust me.","supporting_source_indexes":[88],"contradicting_source_indexes":[]}]'}
 
     claim = run(verify_text("The latest API version is 4.2.1.", FakeTavily(), Uncited()))["claims"][0]
@@ -154,7 +154,7 @@ def test_malformed_assessor_output_leaves_claims_unassessed():
     class Garbage:
         configured = True
 
-        async def complete(self, system, user):
+        async def complete(self, system, user, **kwargs):
             return {"content": "I think it's fine!"}
 
     report = run(verify_text("The latest API version is 4.2.1.", FakeTavily(), Garbage()))
@@ -165,7 +165,7 @@ def test_assessor_exception_is_contained():
     class Down:
         configured = True
 
-        async def complete(self, system, user):
+        async def complete(self, system, user, **kwargs):
             raise RuntimeError("gateway down")
 
     assert run(verify_text("The latest API version is 4.2.1.", FakeTavily(), Down()))["claims"][0]["verdict"] == "unassessed"
