@@ -1,0 +1,14 @@
+services:
+  app:
+    build: .
+    ports: ["8000:8000"]
+    env_file: .env
+    environment:
+      APP_ENV: production
+      DB_PATH: /data/freshcode.db
+      RUNNER_MODE: "off"        # code execution disabled by default; see docs/SECURITY.md before enabling docker mode
+      COOKIE_SECURE: "0"        # set to 1 when served over HTTPS (reverse proxy)
+    volumes: ["freshcode-data:/data"]
+    restart: unless-stopped
+volumes:
+  freshcode-data:

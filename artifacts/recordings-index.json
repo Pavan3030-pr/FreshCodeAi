@@ -1,0 +1,108 @@
+{
+  "generated_utc": "2026-11-14T06:41:43Z",
+  "journeys_passed": 19,
+  "journeys_total": 19,
+  "duration_s": 174.5,
+  "files": [
+    {
+      "path": "browser-recordings/full-user-journey-trace.zip",
+      "bytes": 38971784
+    },
+    {
+      "path": "browser-recordings/full-user-journey.webm",
+      "bytes": 8555022
+    },
+    {
+      "path": "browser-recordings/judge-demo.webm",
+      "bytes": 3154156
+    },
+    {
+      "path": "screenshots/01_landing.png",
+      "bytes": 224799
+    },
+    {
+      "path": "screenshots/02_registration_error.png",
+      "bytes": 137971
+    },
+    {
+      "path": "screenshots/03_overview.png",
+      "bytes": 275398
+    },
+    {
+      "path": "screenshots/04_projects_empty.png",
+      "bytes": 118131
+    },
+    {
+      "path": "screenshots/05_agent_empty.png",
+      "bytes": 220522
+    },
+    {
+      "path": "screenshots/05_projects.png",
+      "bytes": 123264
+    },
+    {
+      "path": "screenshots/06_engineering_agent.png",
+      "bytes": 198862
+    },
+    {
+      "path": "screenshots/08_execution_trace.png",
+      "bytes": 503349
+    },
+    {
+      "path": "screenshots/09_freshness.png",
+      "bytes": 443458
+    },
+    {
+      "path": "screenshots/10_evaluation_lab.png",
+      "bytes": 328085
+    },
+    {
+      "path": "screenshots/10_usage.png",
+      "bytes": 134615
+    },
+    {
+      "path": "screenshots/11_test_lab.png",
+      "bytes": 189108
+    },
+    {
+      "path": "screenshots/12_history.png",
+      "bytes": 179463
+    },
+    {
+      "path": "screenshots/13_integrations.png",
+      "bytes": 210538
+    },
+    {
+      "path": "screenshots/14_account.png",
+      "bytes": 147696
+    },
+    {
+      "path": "screenshots/15_guest_demo.png",
+      "bytes": 180129
+    },
+    {
+      "path": "screenshots/16_mobile_landing.png",
+      "bytes": 84682
+    },
+    {
+      "path": "screenshots/17_mobile_login.png",
+      "bytes": 51481
+    },
+    {
+      "path": "screenshots/18_mobile_agent.png",
+      "bytes": 67918
+    },
+    {
+      "path": "screenshots/18_mobile_history.png",
+      "bytes": 56178
+    },
+    {
+      "path": "screenshots/18_mobile_overview.png",
+      "bytes": 68653
+    },
+    {
+      "path": "screenshots/judge_registration.png",
+      "bytes": 139219
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+name: ci
+on: [push, pull_request]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12", cache: pip }
+      - uses: actions/setup-node@v4
+        with: { node-version: "22" }
+      - run: pip install -r requirements-dev.txt
+      - run: python -m pytest -q
+      - run: node --test tests/js/lib.test.js tests/js/dom.test.js tests/js/landing.test.js
+  e2e:
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12", cache: pip }
+      - uses: actions/setup-node@v4
+        with: { node-version: "22" }
+      - run: pip install -r requirements-dev.txt && python -m playwright install --with-deps chromium
+      - run: python tests/e2e/run_e2e.py e2e-shots
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: { name: e2e-screenshots, path: e2e-shots }
+  security:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: pip install pip-audit && pip-audit -r requirements.txt
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker build -t freshcode-ai .
+      - run: docker build -f runner/Dockerfile -t freshcode-runner:latest runner
+      - run: docker run -d --name app -p 8000:8000 -e RUNNER_MODE=off freshcode-ai && sleep 6 && curl -fsS http://localhost:8000/api/v1/ready

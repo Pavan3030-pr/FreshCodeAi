@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="light">
+<meta name="theme-color" content="#f3ebdd">
+<meta name="description" content="FreshCode AI is an AI engineering workspace that researches current technical knowledge through Tavily, compresses evidence, generates code through Bifrost, runs tests and verifies changing technical claims.">
+<title>FreshCode AI — fresh context, lean tokens, verified code</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%2349365f'/%3E%3Ctext x='16' y='23' font-size='20' text-anchor='middle' fill='%23f5d7c6' font-family='serif' font-weight='700'%3EF%3C/text%3E%3C/svg%3E">
+<script src="/static/theme.js?v=5.1.0"></script>
+<link rel="stylesheet" href="/static/style.css?v=5.1.0">
+<link rel="stylesheet" href="/static/landing.css?v=5.1.0">
+</head>
+<body class="landing">
+<a class="skip-link" href="#top">Skip to content</a>
+<header class="l-header">
+  <div class="l-wrap l-header-in">
+    <a class="brand" href="/"><span class="brand-mark" aria-hidden="true">F</span><span class="brand-text">freshcode<i>.ai</i></span></a>
+    <nav class="l-nav" aria-label="Sections"><a href="#how">Workflow</a><a href="#bifrost">Bifrost</a><a href="#tavily">Tavily</a><a href="#freshness">Freshness</a><a href="#evidence">Evidence</a><a href="#security">Security</a><a href="#faq">FAQ</a></nav>
+    <div class="l-actions"><a class="btn" href="/login">Sign in</a><a class="btn primary" href="/login#signup">Get started</a></div>
+  </div>
+</header>
+
+<main id="top">
+  <section class="l-hero">
+    <div class="l-wrap l-hero-grid">
+      <div class="l-hero-copy">
+        <p class="eyebrow">AI ENGINEERING RELIABILITY</p>
+        <h1>Fresh context. <span class="nowrap">Lean tokens.</span> Verified code.</h1>
+        <p class="lead">An AI engineering workspace that researches current technical knowledge, compresses evidence, generates code, runs tests and verifies changing technical claims.</p>
+        <div class="hero-actions">
+          <a class="btn primary big" href="/login#signup">Create a free account</a>
+          <a class="btn big" href="/app#demo">▶ Run the 60-second demo <small>no API keys</small></a>
+        </div>
+        <ul class="proof" aria-label="Proof points"><li>Real tests, real exit codes</li><li>Provider-measured tokens</li><li>Cited, trust-tiered sources</li></ul>
+      </div>
+      <figure class="l-shot-wrap">
+        <img class="l-shot" src="/static/img/preview-agent.png" width="1440" height="900" alt="The FreshCode Engineering Agent: task configuration on the left, generated code in the centre and the live execution trace on the right.">
+        <figcaption class="hint">Screenshot of the running app (stubbed providers on the test server). Your numbers come from your own runs.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section class="l-strip" aria-label="Live proof from this server">
+    <div class="l-wrap">
+      <div class="l-strip-head"><b>Live from this server</b><span class="pill good" id="proof-status">checking…</span><span class="hint">Offline self-check on small hand-written labelled sets. Directional, not a benchmark claim.</span></div>
+      <div class="l-strip-grid" id="proof-eval" aria-live="polite">
+        <div class="metric"><b>—</b><small>VERSION-DRIFT CASES PASSED</small></div>
+        <div class="metric"><b>—</b><small>KEY FACT KEPT AFTER COMPRESSION</small></div>
+        <div class="metric"><b>—</b><small>AVG TOKENS SAVED (EST.)</small></div>
+        <div class="metric"><b>—</b><small>CLAIM EXTRACTION ACCURACY</small></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="l-section l-wrap" id="problem" aria-labelledby="h-problem">
+    <p class="eyebrow">THE PROBLEM</p>
+    <h2 id="h-problem">AI coding assistants waste money twice.</h2>
+    <div class="l-two">
+      <div class="l-point"><span class="l-big">01</span><h3>Bloated context</h3><p>Whole web pages go into the prompt: boilerplate, duplicates, marketing copy. You pay for every token, on every call.</p></div>
+      <div class="l-point"><span class="l-big">02</span><h3>Confident, outdated facts</h3><p>The answer says “v3.4 is the latest” when v3.5 shipped. Nobody notices until the build breaks.</p></div>
+    </div>
+  </section>
+
+  <section class="l-band l-lav" id="how" aria-labelledby="h-how">
+    <div class="l-wrap">
+      <p class="eyebrow">ENGINEERING WORKFLOW</p>
+      <h2 id="h-how">Describe it. Research it. Prove it.</h2>
+      <ol class="l-steps">
+        <li><i>1</i><b>Describe</b><span>State the engineering problem, language and constraints.</span></li>
+        <li><i>2</i><b>Research</b><span>Tavily retrieves current technical references.</span></li>
+        <li><i>3</i><b>Compress</b><span>Evidence is deduplicated and trimmed to a token budget you set.</span></li>
+        <li><i>4</i><b>Generate</b><span>One lean Bifrost call returns implementation and tests, kept separate.</span></li>
+        <li><i>5</i><b>Test and repair</b><span>Real tests run. A failure gets one controlled repair attempt.</span></li>
+        <li><i>6</i><b>Trace</b><span>Every stage is saved with the run for inspection and export.</span></li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="l-section l-wrap" id="bifrost" aria-labelledby="h-bifrost">
+    <div class="l-split">
+      <div><p class="eyebrow">BIFROST</p><h2 id="h-bifrost">The model gateway behind every generation</h2>
+        <p class="l-body">FreshCode sends generation, evidence assessment and benchmark calls through a Bifrost gateway using its OpenAI-compatible API. The app records the usage the provider reports for each call, so token numbers are measurements rather than guesses.</p>
+        <ul class="l-list"><li>Primary, assessor and fallback model routing</li><li>Response caching: an identical prompt costs 0 new tokens</li><li>Retries with timeouts, secrets redacted from every error</li><li>“Verified” shown only after a real upstream request has succeeded</li></ul></div>
+      <div class="l-card l-peach"><h3>What you see in the app</h3><p class="l-body">Provider input and total tokens, model name, request id and latency on every run, each labelled <b>measured</b>. Local counts are labelled <b>estimated</b>.</p></div>
+    </div>
+  </section>
+
+  <section class="l-band l-peachband" id="tavily" aria-labelledby="h-tavily">
+    <div class="l-wrap l-split">
+      <div class="l-card l-lavcard"><h3>What you see in the app</h3><p class="l-body">Source titles, URLs, publication dates when the provider returns them, a trust tier per domain, relevance scores and the Tavily request id for each retrieval.</p></div>
+      <div><p class="eyebrow">TAVILY</p><h2 id="h-tavily">The research and freshness layer</h2>
+        <p class="l-body">Before generating, FreshCode asks Tavily for current references so the model works from what is true today, not from training data. The same search powers claim checking.</p>
+        <ul class="l-list"><li>Live retrieval with cached repeats</li><li>Trust tiers: primary, reputable, community, unclassified</li><li>Graceful degradation: a failed search is reported, never hidden</li></ul></div>
+    </div>
+  </section>
+
+  <section class="l-section l-wrap" id="compression" aria-labelledby="h-comp">
+    <p class="eyebrow">CONTEXT COMPRESSION</p>
+    <h2 id="h-comp">A bounded context, not a pasted web page</h2>
+    <div class="l-two">
+      <p class="l-body">Retrieved pages are stripped of boilerplate, deduplicated and ranked sentence by sentence against your task. The result is trimmed to a context budget you control per project.</p>
+      <div class="l-card l-sage"><h3>Measured, not promised</h3><p class="l-body">The Evaluation Lab runs paired baseline versus compressed calls on the same model and sources in alternating order, then reports provider-measured input tokens, latency and a raw CSV. Samples are small, so results are directional.</p></div>
+    </div>
+  </section>
+
+  <section class="l-band l-sandband" id="verification" aria-labelledby="h-ver">
+    <div class="l-wrap">
+      <p class="eyebrow">CODE VERIFICATION</p>
+      <h2 id="h-ver">Tests run. Failures are reported as failures.</h2>
+      <div class="l-two">
+        <div><p class="l-body">Generated Python and JavaScript tests run for real. If they fail, the failure output goes into one compact repair prompt, and the repair is accepted only if it is strictly better. A stage that fails shows its real failure state.</p></div>
+        <div class="l-card l-lavcard"><h3>Execution modes</h3><p class="l-body">Docker mode runs code in a disposable container with no network and a read-only filesystem. The local runner enforces limits but is <b>not</b> a sandbox, and the app says so wherever it is used.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="l-section l-wrap" id="freshness" aria-labelledby="h-fresh">
+    <p class="eyebrow">FRESHNESS INTELLIGENCE</p>
+    <h2 id="h-fresh">Catch answers that quietly went stale</h2>
+    <div class="l-feature">
+      <div><p class="l-body">Paste any technical answer. FreshCode extracts the claims most likely to change, retrieves current sources and flags newer versions it finds in the evidence. Suggested corrections are labelled as suggestions, with the sources one click away.</p><p class="l-body">Version-drift detection is a heuristic. It never presents an uncertain finding as definitive.</p></div>
+      <div class="l-mini"><div class="l-row"><span class="pill bad">Before</span> AcmeSDK <mark class="old">2.3</mark> is the latest stable version.</div><div class="l-row"><span class="pill good">After</span> AcmeSDK <mark>2.7.1</mark> is the latest stable version.</div><small>Fictional SDK, for illustration.</small></div>
+    </div>
+  </section>
+
+  <section class="l-band l-sageband" id="evidence" aria-labelledby="h-proof">
+    <div class="l-wrap">
+      <p class="eyebrow">BENCHMARK EVIDENCE</p>
+      <h2 id="h-proof">What is measured, and what is not</h2>
+      <div class="l-two">
+        <div class="l-card"><h3>Measured</h3><ul class="l-list"><li>Provider-reported input tokens (paired, alternating runs, same model)</li><li>Real test execution results and exit codes</li><li>Tavily request ids and response times</li></ul></div>
+        <div class="l-card"><h3>Estimated or heuristic, and labelled</h3><ul class="l-list"><li>Local token counts used for compression</li><li>Claim extraction and version-drift detection</li><li>The savings % in the calculator below is your assumption until you paste a measured value</li></ul></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="l-section l-wrap" id="roi" aria-labelledby="h-roi">
+    <p class="eyebrow">BUSINESS CASE</p>
+    <h2 id="h-roi">What it could save at your scale</h2>
+    <div class="l-card l-lavcard">
+      <div class="l-form">
+        <div><label class="field-label" for="roi-req">Requests per day</label><input id="roi-req" class="control" type="number" min="0" value="1000"></div>
+        <div><label class="field-label" for="roi-tokens">Input tokens per request</label><input id="roi-tokens" class="control" type="number" min="0" value="4000"></div>
+        <div><label class="field-label" for="roi-price">Price per 1M input tokens (USD)</label><input id="roi-price" class="control" type="number" min="0" step="0.1" value="3"></div>
+        <div><label class="field-label" for="roi-pct">Input-token savings % (assumption)</label><input id="roi-pct" class="control" type="number" min="0" max="100" value="40"></div>
+      </div>
+      <div class="metrics" id="roi-out"></div>
+      <p class="hint">A hypothesis to test, not a promise. Measure your real number in the Evaluation Lab, then paste it here.</p>
+    </div>
+  </section>
+
+  <section class="l-band l-lav" id="security" aria-labelledby="h-sec">
+    <div class="l-wrap">
+      <p class="eyebrow">SECURITY AND PRIVACY</p>
+      <h2 id="h-sec">Built so you can inspect the claims</h2>
+      <div class="l-three">
+        <div class="l-card"><h3>Your data</h3><p class="l-body">Projects, runs and reports are private to your account. Sessions use signed cookies with CSRF protection, and every account action lands in an audit trail.</p></div>
+        <div class="l-card"><h3>Your secrets</h3><p class="l-body">Provider keys live on the server only and are redacted from logs and errors. A strict Content Security Policy blocks inline scripts.</p></div>
+        <div class="l-card"><h3>Generated code</h3><p class="l-body">Treated as untrusted. Use Docker mode for isolation; the local runner is not a sandbox. See docs/SECURITY.md for the audited limits.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="l-section l-wrap" id="architecture" aria-labelledby="h-arch">
+    <p class="eyebrow">TECHNICAL ARCHITECTURE</p>
+    <h2 id="h-arch">Small pieces, each testable on its own</h2>
+    <div class="l-arch" role="img" aria-label="Architecture: browser, FastAPI with guard middleware, services for Tavily, compressor, Bifrost and runner, and SQLite">
+      <div class="l-box b1"><b>Browser</b><span>Landing + workspace, SSE progress</span></div>
+      <div class="l-arrow" aria-hidden="true">→</div>
+      <div class="l-box b2"><b>FastAPI</b><span>Auth · CSRF · rate limits · CSP</span></div>
+      <div class="l-arrow" aria-hidden="true">→</div>
+      <div class="l-stack">
+        <div class="l-box b3"><b>Tavily</b><span>live evidence</span></div>
+        <div class="l-box b3"><b>Compressor</b><span>token budget</span></div>
+        <div class="l-box b3"><b>Bifrost</b><span>cache · retry · fallback</span></div>
+        <div class="l-box b3"><b>Runner</b><span>pytest / node:test</span></div>
+      </div>
+      <div class="l-arrow" aria-hidden="true">→</div>
+      <div class="l-box b4"><b>SQLite</b><span>history · traces · stats</span></div>
+    </div>
+  </section>
+
+  <section class="l-band l-peachband" id="faq" aria-labelledby="h-faq">
+    <div class="l-wrap">
+    <p class="eyebrow">FAQ</p>
+    <h2 id="h-faq">Straight answers</h2>
+    <div class="l-faq">
+      <details><summary>Is the no-key demo real?</summary><p>The search results and sample code are labelled fixtures for a fictional SDK. Evidence compression, version-drift detection and the test run execute live, right now.</p></details>
+      <details><summary>How is the token saving measured?</summary><p>Gateway-reported input tokens, paired runs in alternating order, same model. Three pairs on one task is directional. If the gateway returns no usage, the app claims no saving.</p></details>
+      <details><summary>How accurate is stale-claim detection?</summary><p>It is a heuristic. The built-in self-check uses small hand-written sets, so treat the numbers as optimistic. Always confirm on the official source.</p></details>
+      <details><summary>Is running generated code safe?</summary><p>Only in Docker mode, which this project implements but which must be verified on your Docker host. The local runner is defence in depth, not a sandbox, and execution is off by default in production.</p></details>
+      <details><summary>Which languages are tested automatically?</summary><p>Python (pytest) and JavaScript (node:test, needs Node.js). Other languages are generated but not executed.</p></details>
+    </div>
+    </div>
+  </section>
+
+  <section class="l-cta">
+    <div class="l-wrap">
+      <h2>See it catch a stale answer in under a minute.</h2>
+      <div class="hero-actions"><a class="btn primary big" href="/app#demo">▶ Run the demo</a><a class="btn big" href="/login#signup">Create an account</a></div>
+    </div>
+  </section>
+</main>
+
+<footer class="l-footer"><div class="l-wrap l-foot-grid">
+  <div><a class="brand" href="/"><span class="brand-mark" aria-hidden="true">F</span><span class="brand-text">freshcode<i>.ai</i></span></a><p class="hint">FreshCode AI · v5.1.0 · MIT licence. Evidence first.</p></div>
+  <nav aria-label="Footer"><a href="/login">Sign in</a><a href="/login#signup">Create account</a><a href="/app#demo">Guest demo</a><a href="/api/v1/docs">API docs</a></nav>
+</div></footer>
+<script src="/static/lib.js?v=5.1.0"></script>
+<script src="/static/landing.js?v=5.1.0"></script>
+</body>
+</html>

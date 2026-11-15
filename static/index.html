@@ -1,0 +1,358 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="light">
+<meta name="theme-color" content="#f3ebdd">
+<meta name="description" content="FreshCode AI: a token-efficient, freshness-aware, self-verifying coding agent built on Bifrost and Tavily.">
+<title>FreshCode AI — fresh context, lean tokens, verified code</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%2349365f'/%3E%3Ctext x='16' y='23' font-size='20' text-anchor='middle' fill='%23f5d7c6' font-family='sans-serif' font-weight='700'%3EF%3C/text%3E%3C/svg%3E">
+<script src="/static/theme.js?v=5.1.0"></script>
+<link rel="stylesheet" href="/static/style.css?v=5.1.0">
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to main content</a>
+<div class="app-shell" id="app-shell">
+  <aside class="sidebar" id="sidebar" aria-label="Primary">
+    <div class="sidebar-top"><a class="brand" href="#overview" data-view="overview"><span class="brand-mark" aria-hidden="true">F</span><span class="brand-text">freshcode<i>.ai</i></span></a><button type="button" class="collapse-btn" id="collapse-nav" aria-label="Collapse sidebar" aria-pressed="false" title="Collapse sidebar"><svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="15 6 9 12 15 18"/></svg></button></div>
+    <nav class="nav" aria-label="Main navigation">
+      <p class="nav-label">Workspace</p>
+      <button class="nav-item" data-view="overview"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg></span><span class="lbl">Overview</span></button>
+      <button class="nav-item" data-view="projects"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></span><span class="lbl">Projects</span></button>
+      <button class="nav-item" data-view="agent"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24"><polyline points="8 7 3 12 8 17"/><polyline points="16 7 21 12 16 17"/><line x1="14" y1="5" x2="10" y2="19"/></svg></span><span class="lbl">Engineering agent</span></button>
+      <button class="nav-item" data-view="verify"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.5" y2="16.5"/><polyline points="8 11 10.5 13.5 14.5 8.5"/></svg></span><span class="lbl">Freshness intelligence</span></button>
+      <button class="nav-item" data-view="benchmarks"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24"><line x1="6" y1="20" x2="6" y2="11"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="18" y1="20" x2="18" y2="14"/></svg></span><span class="lbl">Evaluation lab</span></button>
+      <p class="nav-label">Records</p>
+      <button class="nav-item" data-view="history"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg></span><span class="lbl">History &amp; reports</span><span class="badge" id="nav-history-count" hidden>0</span></button>
+      <button class="nav-item" data-view="tests"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 3h6"/><path d="M10 3v6L4.5 19a2 2 0 0 0 1.8 3h11.4a2 2 0 0 0 1.8-3L14 9V3"/></svg></span><span class="lbl">Test lab</span></button>
+      <p class="nav-label">Settings</p>
+      <button class="nav-item" data-view="settings"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12a7 7 0 0 1 14 0"/><circle cx="12" cy="12" r="2.5"/><line x1="12" y1="14.5" x2="12" y2="20"/></svg></span><span class="lbl">Integrations</span></button>
+      <button class="nav-item" data-view="account"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></span><span class="lbl">Account</span></button>
+    </nav>
+    <div class="sidebar-foot">
+      <div class="conn-card" id="conn-card"><div class="conn-head"><span class="dot" id="conn-dot"></span><b id="conn-title">Checking services…</b></div><p id="conn-detail">Contacting the backend.</p></div>
+      <button class="kbd-hint" id="open-palette" aria-label="Open command palette"><span>Quick actions</span><kbd>Ctrl K</kbd></button>
+    </div>
+  </aside>
+
+  <div class="drawer-scrim" id="drawer-scrim"></div>
+  <div class="main-col">
+    <header class="topbar">
+      <div class="top-left"><button type="button" class="menu-btn" id="menu-btn" aria-label="Open navigation menu" aria-expanded="false" aria-controls="sidebar"><svg viewBox="0 0 24 24" aria-hidden="true"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg></button>
+      <div class="crumbs"><span>Workspace</span><span aria-hidden="true">/</span><b id="crumb">Overview</b></div></div>
+      <div class="top-actions">
+        <label class="sr-only" for="project-select">Active project</label>
+        <select id="project-select" class="project-select" title="Active project"><option value="">All projects</option></select>
+        <span class="prov" id="prov-bifrost" title="Bifrost status"><span class="dot" id="pdot-bifrost"></span><span class="pv-label">Bifrost</span><b id="ptxt-bifrost">…</b></span>
+        <span class="prov" id="prov-tavily" title="Tavily status"><span class="dot" id="pdot-tavily"></span><span class="pv-label">Tavily</span><b id="ptxt-tavily">…</b></span>
+        <span class="env-pill" id="env-pill">LOCAL</span>
+        <button class="icon-btn" id="refresh" aria-label="Refresh status" title="Refresh status">↻</button>
+        <div class="user-chip" id="user-chip" hidden><span class="avatar" id="user-avatar" aria-hidden="true">?</span><span class="user-name" id="user-name"></span><button class="btn-sm" id="signout" type="button">Sign out</button></div>
+        <a class="btn primary btn-sm" id="signin-link" href="/login" hidden>Sign in</a>
+      </div>
+    </header>
+
+    <main id="main" tabindex="-1">
+      <div class="callout info guest-banner" id="guest-banner" hidden><b>Guest demo.</b> You are exploring without an account, so only the demo is available. <a href="/login">Sign in</a> or <a href="/login#signup">create an account</a> to use the workspace, save projects and export reports.</div>
+      <!-- OVERVIEW -->
+      <section class="view" id="view-overview" aria-labelledby="h-overview">
+        <header class="welcome">
+          <div>
+            <p class="eyebrow" id="ov-eyebrow">OVERVIEW</p>
+            <h1 id="h-overview">Welcome to <span>FreshCode</span></h1>
+            <p class="lead">Fresh context. Lean tokens. Verified code. Every number on this page comes from your saved runs or from a live provider check.</p>
+            <div class="hero-actions">
+              <button class="btn primary big" data-go="agent">Start engineering task →</button>
+              <button class="btn big" data-go="projects">Create project</button>
+              <button class="btn big" id="run-demo">▶ Run the 60-second demo <small>no API keys</small></button>
+            </div>
+          </div>
+          <div class="quick" aria-label="Quick actions">
+            <button type="button" data-go="verify">Verify a technical claim <small>Freshness</small></button>
+            <button type="button" data-go="benchmarks">Run a paired benchmark <small>Evaluation</small></button>
+            <button type="button" data-go="tests">Run tests on code <small>Test lab</small></button>
+            <button type="button" data-go="history">Open saved reports <small>History</small></button>
+          </div>
+        </header>
+        <div id="demo-result" class="stack" aria-live="polite" hidden></div>
+
+        <div class="kpis" id="kpis">
+          <article class="card kpi tone-sage"><span class="kpi-label">TOKEN SAVINGS (MEASURED)</span><b id="kpi-savings">—</b><small id="kpi-savings-foot">Run a benchmark with Bifrost to measure.</small></article>
+          <article class="card kpi tone-lav"><span class="kpi-label">TEST PASS RATE</span><b id="kpi-pass">—</b><small id="kpi-pass-foot">No test runs yet.</small></article>
+          <article class="card kpi tone-peach"><span class="kpi-label">TOTAL RUNS</span><b id="kpi-runs">0</b><small id="kpi-runs-foot">Stored in the local database.</small></article>
+          <article class="card kpi tone-mint"><span class="kpi-label">AVG LATENCY</span><b id="kpi-latency">—</b><small>Per stored run.</small></article>
+        </div>
+
+        <div class="grid-2">
+          <article class="card">
+            <div class="card-head"><div><h2>Recent runs</h2><p>Persisted in SQLite, private to your account.</p></div><button class="link" data-go="history">All history</button></div>
+            <div id="recent" class="list"><div class="empty"><b>No activity yet</b><small>Start an engineering task or run the demo to see runs here.</small></div></div>
+          </article>
+          <article class="card tone-lav">
+            <div class="card-head"><div><h2>Provider status</h2><p>“Verified” means a real upstream request succeeded since startup.</p></div><button class="link" data-go="settings">Integrations</button></div>
+            <div id="ov-providers" class="list"><div class="skeleton"></div></div>
+          </article>
+        </div>
+        <div class="grid-2">
+          <article class="card tone-peach">
+            <div class="card-head"><div><h2>Project activity</h2><p>Runs filed under each project.</p></div><button class="link" data-go="projects">Manage</button></div>
+            <div id="ov-projects" class="list"><div class="skeleton"></div></div>
+          </article>
+          <article class="card tone-mint">
+            <div class="card-head"><div><h2>Usage today</h2><p>Your daily run quota on this deployment.</p></div><button class="link" data-view="account" data-acct-open="usage">Details</button></div>
+            <div id="ov-usage"><div class="skeleton"></div></div>
+          </article>
+        </div>
+        <article class="card tone-sand">
+          <div class="card-head"><div><h2>How a run works</h2><p>Each stage is reported by the backend and recorded in the run trace.</p></div></div>
+          <ol class="stepper" aria-label="How it works">
+            <li><i>1</i><b>Research</b><span>Tavily fetches current sources for the task.</span></li>
+            <li><i>2</i><b>Compress</b><span>Dedupe, rank and trim evidence to a token budget.</span></li>
+            <li><i>3</i><b>Generate</b><span>One lean Bifrost call, cached when repeated.</span></li>
+            <li><i>4</i><b>Verify</b><span>Run the generated tests; one compact repair if red.</span></li>
+          </ol>
+        </article>
+      </section>
+
+      <!-- PROJECTS -->
+      <section class="view" id="view-projects" hidden aria-labelledby="h-projects">
+        <header class="page-head"><div><p class="eyebrow">ORGANISE</p><h1 id="h-projects">Projects</h1><p class="lead">Group runs by what you are building. A project stores default language, constraints and context budget, and every run can be filed under it.</p></div><button class="btn primary" id="project-new">+ New project</button></header>
+        <div class="card" id="project-form-card" hidden>
+          <h2 id="project-form-title">New project</h2>
+          <form id="project-form" novalidate>
+            <input type="hidden" id="pf-id">
+            <div class="row2"><div><label class="field-label" for="pf-name">Name</label><input id="pf-name" class="control" maxlength="80" required></div>
+            <div><label class="field-label" for="pf-language">Default language</label><select id="pf-language" class="control"><option value="python">Python</option><option value="javascript">JavaScript</option><option value="java">Java</option><option value="typescript">TypeScript</option><option value="go">Go</option><option value="rust">Rust</option></select></div></div>
+            <label class="field-label" for="pf-desc">Description</label><textarea id="pf-desc" rows="2" maxlength="500"></textarea>
+            <div class="row2"><div><label class="field-label" for="pf-constraints">Default constraints</label><input id="pf-constraints" class="control" maxlength="2000" placeholder="e.g. Java 21, Spring Boot 3.x"></div>
+            <div><label class="field-label" for="pf-budget">Context budget (est. tokens)</label><input id="pf-budget" class="control" type="number" min="200" max="4000" step="100" value="900"></div></div>
+            <div class="auth-error" id="pf-error" role="alert" hidden></div>
+            <div class="actions"><button class="btn" id="pf-cancel" type="button">Cancel</button><button class="btn primary" id="pf-save" type="submit">Save project</button></div>
+          </form>
+        </div>
+        <div class="row-tools"><label class="sr-only" for="project-search">Search projects</label><input id="project-search" class="control" type="search" placeholder="Search projects…"><label class="switch"><input type="checkbox" id="project-archived"> Show archived</label></div>
+        <div id="project-list" class="grid-3" aria-live="polite"></div>
+      </section>
+
+      <!-- AGENT -->
+      <section class="view" id="view-agent" hidden aria-labelledby="h-agent">
+        <header class="page-head"><div><p class="eyebrow">BIFROST × TAVILY</p><h1 id="h-agent">Engineering <span>agent</span></h1><p class="lead">Research → compress → generate → test → repair → verify. Every stage is reported by the backend, never simulated.</p></div><span class="tag purple">TOKEN-EFFICIENT</span></header>
+        <div class="ws-tabs" role="tablist" aria-label="Workspace panels">
+          <button type="button" role="tab" data-pane="config" aria-selected="false">Configure</button>
+          <button type="button" role="tab" data-pane="main" aria-selected="true">Workspace</button>
+          <button type="button" role="tab" data-pane="exec" aria-selected="false">Execution</button>
+        </div>
+        <div class="ws" id="ws" data-pane="main">
+          <aside class="ws-col ws-config" aria-label="Task configuration">
+            <h2>Task configuration</h2>
+            <label class="field-label" for="agent-project">Project</label>
+            <select id="agent-project" class="control"><option value="">No project</option></select>
+            <label class="field-label" for="language">Language</label>
+            <select id="language" class="control"><option value="python">Python (tested)</option><option value="java">Java</option><option value="typescript">TypeScript</option><option value="javascript">JavaScript (tested)</option><option value="go">Go</option><option value="rust">Rust</option></select>
+            <label class="field-label" for="constraints">Version / constraints</label>
+            <input id="constraints" class="control" placeholder="e.g. Java 21, Spring Boot 3.4">
+            <div class="budget"><label for="budget">Context budget: <b id="budget-val">900</b> est. tokens</label><input id="budget" type="range" min="200" max="3000" step="100" value="900"></div>
+            <p class="field-label">Verification</p>
+            <div class="toggles col">
+              <label class="toggle"><input id="verify-facts" type="checkbox" checked><span><b>Research current docs</b><small>Tavily, compressed to the budget</small></span></label>
+              <label class="toggle"><input id="auto-test" type="checkbox" checked><span><b>Run generated tests</b><small>Python and JavaScript</small></span></label>
+              <label class="toggle"><input id="auto-repair" type="checkbox" checked><span><b>Auto-repair once</b><small>Compact failure prompt</small></span></label>
+            </div>
+            <p class="hint" id="agent-runner-note">Code execution mode is shown once the server status loads.</p>
+          </aside>
+
+          <section class="ws-col ws-main" aria-label="Engineering workspace">
+            <div class="card editor">
+              <div class="chips" role="group" aria-label="Example tasks"><span class="chips-label">Try an example</span>
+                <button class="chip" data-preset="agent-1">JWT validator (Java)</button>
+                <button class="chip" data-preset="agent-2">Rate limiter (Python)</button>
+                <button class="chip" data-preset="agent-3">Debounce (TypeScript)</button>
+              </div>
+              <label class="field-label" for="task">Task</label>
+              <textarea id="task" rows="7" placeholder="Describe what to build, including edge cases. Ctrl+Enter to run."></textarea>
+              <div class="run-bar">
+                <span class="hint">Ctrl+Enter to run · <span class="elapsed" id="elapsed" aria-label="Elapsed time">00:00.0</span></span>
+                <span class="btn-row"><button class="btn" id="cancel-run" type="button" hidden>Stop run</button><button class="btn" id="retry-run" type="button" hidden>Retry</button><button class="btn primary" id="generate">Run engineering task →</button></span>
+              </div>
+            </div>
+            <div id="agent-output" class="stack" aria-live="polite">
+              <div class="ph"><b>Generated code appears here</b><span>Implementation and tests are shown with syntax highlighting once a real run finishes.</span></div>
+            </div>
+          </section>
+
+          <aside class="ws-col ws-exec" aria-label="Execution intelligence">
+            <article class="card">
+              <div class="card-head"><div><h2>Execution trace</h2><p>Live stages reported by the backend.</p></div><span class="pill muted" id="run-state">Idle</span></div>
+              <ol class="steps" id="pipeline">
+                <li data-stage="received"><i>1</i><span><b>Task received</b></span><em>Waiting</em></li>
+                <li data-stage="research"><i>2</i><span><b>Tavily research</b></span><em>Waiting</em></li>
+                <li data-stage="evidence"><i>3</i><span><b>Evidence collection</b></span><em>Waiting</em></li>
+                <li data-stage="optimize"><i>4</i><span><b>Context compression</b></span><em>Waiting</em></li>
+                <li data-stage="generate"><i>5</i><span><b>Bifrost generation</b></span><em>Waiting</em></li>
+                <li data-stage="extract"><i>6</i><span><b>Code extraction</b></span><em>Waiting</em></li>
+                <li data-stage="test"><i>7</i><span><b>Test execution</b></span><em>Waiting</em></li>
+                <li data-stage="diagnose"><i>8</i><span><b>Failure diagnosis</b></span><em>Waiting</em></li>
+                <li data-stage="repair"><i>9</i><span><b>Repair attempt</b></span><em>Waiting</em></li>
+                <li data-stage="final"><i>10</i><span><b>Final verification</b></span><em>Waiting</em></li>
+                <li data-stage="saved"><i>11</i><span><b>Saved run trace</b></span><em>Waiting</em></li>
+              </ol>
+              <details><summary>Activity log</summary><div class="activity" id="activity" role="log" aria-live="polite" aria-label="Live activity log"></div></details>
+            </article>
+            <div id="agent-result" class="stack" aria-live="polite"></div>
+          </aside>
+        </div>
+      </section>
+
+      <!-- VERIFY -->
+      <section class="view" id="view-verify" hidden aria-labelledby="h-verify">
+        <header class="page-head"><div><p class="eyebrow">TAVILY TRACK · PROBLEM 01</p><h1 id="h-verify">Freshness <span>intelligence</span></h1><p class="lead">Paste any AI answer. FreshCode extracts the claims most likely to be stale, checks them against live sources, and flags newer versions it finds.</p></div><span class="tag green">STALE-ANSWER DETECTOR</span></header>
+        <div class="card">
+          <div class="chips" role="group" aria-label="Example answers"><span class="chips-label">Try an example</span>
+            <button class="chip" data-preset="verify-1">Outdated framework answer</button>
+            <button class="chip" data-preset="verify-2">Pricing &amp; API claims</button>
+          </div>
+          <label class="field-label" for="verify-text">Answer to check</label>
+          <textarea id="verify-text" rows="7" placeholder="Paste an answer containing versions, prices, API details, release or policy claims. Ctrl+Enter to run."></textarea>
+          <div class="actions"><span class="hint">Up to 6 highest-risk claims per run</span><button class="btn primary" id="verify-btn">Verify claims →</button></div>
+        </div>
+        <div id="verify-result" class="stack" aria-live="polite" hidden></div>
+        <article class="card">
+          <div class="card-head"><div><h2>Detector self-check</h2><p>Runs offline on a small hand-written labelled set — no keys, no network.</p></div><button class="btn" id="eval-btn">Run self-check</button></div>
+          <div id="eval-result" aria-live="polite"><p class="hint">Measures version-drift precision/recall and whether compression keeps the answer-bearing fact.</p></div>
+        </article>
+      </section>
+
+      <!-- BENCHMARKS -->
+      <section class="view" id="view-benchmarks" hidden aria-labelledby="h-bench">
+        <header class="page-head"><div><p class="eyebrow">MEASUREMENT</p><h1 id="h-bench">Evaluation <span>lab</span></h1><p class="lead">Same task, same model, same sources. Baseline keeps full context; FreshCode sends the compressed context. Savings come only from provider-reported usage.</p></div><span class="tag blue">PAIRED · ALTERNATING</span></header>
+        <div class="card">
+          <label class="field-label" for="bench-task">Benchmark task</label>
+          <textarea id="bench-task" rows="4" placeholder="Example: Write a Java method to merge two sorted arrays in-place with edge-case tests."></textarea>
+          <div class="row2"><div><label class="field-label" for="bench-lang">Language</label><select id="bench-lang" class="control"><option value="java">Java</option><option value="python">Python</option><option value="typescript">TypeScript</option></select></div><div><span class="field-label">Model</span><div class="readonly" id="bench-model">Configured Bifrost model</div></div></div>
+          <label class="field-label" for="bench-extra">Additional tasks <span class="hint">(optional, one per line, up to 4)</span></label>
+          <textarea id="bench-extra" rows="3" placeholder="Add more tasks to see a range instead of a single data point."></textarea>
+          <div class="actions"><span class="hint" id="bench-cost-hint">6 model calls per task (3 paired samples)</span><button class="btn primary" id="bench-btn">Run benchmark →</button></div>
+        </div>
+        <div id="bench-result" class="stack" aria-live="polite" hidden></div>
+        <article class="card tone-lav"><h2>Methodology and limits</h2><ul class="hint-list"><li><b>Baseline:</b> full retrieved context. <b>Optimised:</b> the compressed context. Same model and sources, alternating call order, 3 paired samples per task.</li><li><b>Measured:</b> provider-reported input tokens and latency. <b>Not compared:</b> output tokens, answer quality, cost billing.</li><li><b>Limits:</b> small samples, no significance test. Results are directional. Export the raw CSV from any result to check the numbers yourself.</li></ul></article>
+        <article class="card">
+          <div class="card-head"><div><h2>What it saves at your scale</h2><p>A cost model. The savings % is an editable assumption unless you paste a measured value.</p></div></div>
+          <div class="row2">
+            <div><label class="field-label" for="roi-req">Requests per day</label><input id="roi-req" class="control" type="number" min="0" value="1000"></div>
+            <div><label class="field-label" for="roi-tokens">Input tokens per request</label><input id="roi-tokens" class="control" type="number" min="0" value="4000"></div>
+          </div>
+          <div class="row2">
+            <div><label class="field-label" for="roi-price">Price per 1M input tokens (USD)</label><input id="roi-price" class="control" type="number" min="0" step="0.1" value="3"></div>
+            <div><label class="field-label" for="roi-pct">Input-token savings % <span class="hint" id="roi-src">(assumption)</span></label><input id="roi-pct" class="control" type="number" min="0" max="100" value="40"></div>
+          </div>
+          <div class="metrics" id="roi-out"></div>
+        </article>
+      </section>
+
+      <!-- TESTS -->
+      <section class="view" id="view-tests" hidden aria-labelledby="h-tests">
+        <header class="page-head"><div><p class="eyebrow">QUALITY GATE</p><h1 id="h-tests">Test <span>lab</span></h1><p class="lead">Run pytest (Python) or node:test (JavaScript) against code. A static policy, resource limits and a timeout guard the runner.</p></div><span class="tag amber" id="runner-mode">RUNNER MODE LOADING</span></header>
+        <div class="card">
+          <div class="chips"><span class="chips-label">Try an example</span><button class="chip" data-preset="test-1">Passing suite</button><button class="chip" data-preset="test-2">Failing suite</button><button class="chip" data-preset="test-3">Blocked import</button><button class="chip" data-preset="test-4">JavaScript suite</button></div>
+          <label class="field-label" for="test-lang">Language</label>
+          <select id="test-lang" class="control"><option value="python">Python (pytest)</option><option value="javascript">JavaScript (node:test)</option></select>
+          <label class="field-label" for="test-code" id="test-code-label">solution.py</label>
+          <textarea id="test-code" class="mono" rows="9" spellcheck="false" placeholder="def add(a, b):&#10;    return a + b"></textarea>
+          <label class="field-label" for="test-suite" id="test-suite-label">test_solution.py</label>
+          <textarea id="test-suite" class="mono" rows="8" spellcheck="false" placeholder="from solution import add&#10;&#10;def test_add():&#10;    assert add(2, 3) == 5"></textarea>
+          <div class="actions"><span class="hint" id="runner-hint">Timeout and limits enforced</span><button class="btn primary" id="test-btn">Run test suite →</button></div>
+        </div>
+        <div id="test-result" class="stack" aria-live="polite" hidden></div>
+        <div class="callout warn"><b>Security boundary.</b> This is defence in depth, not a hardened sandbox. For public deployments, keep the runner disabled or execute it inside an isolated container with no network.</div>
+      </section>
+
+      <!-- HISTORY -->
+      <section class="view" id="view-history" hidden aria-labelledby="h-history">
+        <header class="page-head"><div><p class="eyebrow">PERSISTENCE</p><h1 id="h-history">History &amp; reports</h1><p class="lead">Every run is saved to your account with latency, token data, trace and results. Open a Markdown report or export everything as CSV.</p></div><div class="hero-actions"><button class="btn" id="export-history" type="button">Export CSV</button><button class="btn danger" id="clear-history" type="button">Clear history…</button></div></header>
+        <div class="row-tools">
+          <label class="sr-only" for="hist-q">Search history</label><input id="hist-q" class="control" type="search" placeholder="Search runs…">
+          <label class="sr-only" for="hist-kind">Filter by type</label><select id="hist-kind" class="control"><option value="">All types</option><option value="code">Agent runs</option><option value="verify">Freshness</option><option value="benchmark">Benchmarks</option><option value="test">Tests</option><option value="demo">Demo</option></select>
+          <label class="sr-only" for="hist-status">Filter by status</label><select id="hist-status" class="control"><option value="">Any status</option><option value="ok">ok</option><option value="tests_failed">tests failed</option><option value="failed">failed</option><option value="setup_required">setup required</option><option value="unmeasured">unmeasured</option></select>
+          <label class="switch"><input type="checkbox" id="hist-project"> Active project only</label>
+        </div>
+        <div id="history-list" class="card list"><div class="empty"><b>No runs yet</b></div></div>
+      </section>
+
+      <!-- SETTINGS -->
+      <section class="view" id="view-settings" hidden aria-labelledby="h-settings">
+        <header class="page-head"><div><p class="eyebrow">CONFIGURATION</p><h1 id="h-settings">Integrations &amp; <span>status</span></h1><p class="lead">“Configured” means a key is present. “Verified” means a real upstream request has succeeded since startup.</p></div><button class="btn" id="settings-refresh">Refresh ↻</button></header>
+        <div class="grid-2" id="conn-grid"></div>
+        <article class="card"><h2>Deployment status</h2><dl class="dl" id="deploy-dl"></dl></article>
+        <article class="card"><h2>Configure credentials</h2><p class="hint">Set in <code>.env</code> or your host’s secret manager. Never commit them.</p><pre class="code-block"><code>BIFROST_BASE_URL=http://localhost:4000/v1
+BIFROST_API_KEY=your-virtual-key
+BIFROST_MODEL=your-public-model
+TAVILY_API_KEY=tvly-your-key</code></pre></article>
+      </section>
+      <!-- ACCOUNT -->
+      <section class="view" id="view-account" hidden aria-labelledby="h-account">
+        <header class="page-head"><div><p class="eyebrow">YOUR ACCOUNT</p><h1 id="h-account">Account &amp; security</h1><p class="lead">Profile, password, sessions, usage limits and your audit trail.</p></div></header>
+        <div class="tabs" role="tablist" aria-label="Account sections">
+          <button type="button" role="tab" data-acct="profile" aria-selected="true">Profile</button>
+          <button type="button" role="tab" data-acct="security" aria-selected="false">Security</button>
+          <button type="button" role="tab" data-acct="usage" aria-selected="false">Usage &amp; limits</button>
+          <button type="button" role="tab" data-acct="audit" aria-selected="false">Audit trail</button>
+          <button type="button" role="tab" data-acct="preferences" aria-selected="false">Preferences</button>
+        </div>
+        <div class="stack" id="acct-panels">
+          <section class="card" id="acct-profile" aria-label="Profile">
+            <h2>Profile</h2>
+            <form id="profile-form" novalidate>
+              <label class="field-label" for="pr-email">Email</label><input id="pr-email" class="control" disabled>
+              <label class="field-label" for="pr-name">Display name</label><input id="pr-name" class="control" maxlength="80">
+              <div class="pref"><div><b>Role</b><small id="pr-role">user</small></div></div>
+              <div class="actions"><span class="hint">Your email is your sign-in identity and cannot be changed here.</span><button class="btn primary" type="submit">Save profile</button></div>
+            </form>
+          </section>
+          <section class="card" id="acct-security" aria-label="Security" hidden>
+            <h2>Change password</h2>
+            <form id="password-form" novalidate>
+              <label class="field-label" for="pw-current">Current password</label><input id="pw-current" class="control" type="password" autocomplete="current-password">
+              <label class="field-label" for="pw-new">New password</label><input id="pw-new" class="control" type="password" autocomplete="new-password">
+              <div class="auth-error" id="pw-error" role="alert" hidden></div>
+              <div class="actions"><span class="hint">Changing your password signs out your other sessions.</span><button class="btn primary" type="submit">Update password</button></div>
+            </form>
+            <h2 class="sub">Active sessions</h2>
+            <div id="session-list" class="list"></div>
+            <div class="btn-row"><button class="btn" id="revoke-others" type="button">Sign out all other sessions</button></div>
+            <h2 class="sub">Delete account</h2>
+            <p class="hint">Permanently deletes your account, projects, runs and sessions. This cannot be undone.</p>
+            <div class="btn-row"><button class="btn danger" id="delete-account" type="button">Delete my account…</button></div>
+          </section>
+          <section class="card" id="acct-usage" aria-label="Usage and limits" hidden>
+            <h2>Usage &amp; limits</h2>
+            <div id="usage-body"><div class="skeleton"></div></div>
+          </section>
+          <section class="card" id="acct-audit" aria-label="Audit trail" hidden>
+            <div class="card-head"><div><h2>Audit trail</h2><p>Security-relevant events on your account: sign-ins, password and project changes, exports.</p></div><label class="switch" id="audit-all-wrap" hidden><input type="checkbox" id="audit-all"> All users (admin)</label></div>
+            <div id="audit-list" class="list"></div>
+          </section>
+          <section class="card" id="acct-preferences" aria-label="Preferences" hidden>
+            <h2>Preferences</h2>
+                        <div class="pref"><div><b>Reduce motion</b><small>Turns off animations and transitions.</small></div><label class="switch"><input type="checkbox" data-motion-toggle aria-label="Reduce motion"> Reduce</label></div>
+          </section>
+        </div>
+      </section>
+
+    </main>
+    <footer class="app-footer"><span>FreshCode AI · v5.1.0</span><span>Evidence first. Lean tokens. Verified code.</span></footer>
+  </div>
+</div>
+
+<div class="modal" id="confirm" role="dialog" aria-modal="true" aria-labelledby="confirm-title" aria-describedby="confirm-msg" hidden>
+  <div class="modal-box"><h2 id="confirm-title">Are you sure?</h2><p id="confirm-msg" class="hint"></p><div id="confirm-extra"></div><div class="btn-row modal-actions"><button class="btn" id="confirm-cancel" type="button">Cancel</button><button class="btn danger" id="confirm-ok" type="button">Confirm</button></div></div>
+</div>
+<div class="palette" id="palette" role="dialog" aria-modal="true" aria-label="Command palette" hidden>
+  <div class="palette-box"><input id="palette-input" class="control" placeholder="Type a command…" aria-label="Search commands" autocomplete="off"><ul id="palette-list" role="listbox"></ul></div>
+</div>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+<script src="/static/lib.js?v=5.1.0"></script>
+<script src="/static/app.js?v=5.1.0"></script>
+<script src="/static/account.js?v=5.1.0"></script>
+</body>
+</html>

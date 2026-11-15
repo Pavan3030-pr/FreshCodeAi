@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="light">
+<meta name="theme-color" content="#f3ebdd">
+<title>Sign in · FreshCode AI</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%2349365f'/%3E%3Ctext x='16' y='23' font-size='20' text-anchor='middle' fill='%23f5d7c6' font-family='sans-serif' font-weight='700'%3EF%3C/text%3E%3C/svg%3E">
+<script src="/static/theme.js?v=5.1.0"></script>
+<link rel="stylesheet" href="/static/style.css?v=5.1.0">
+<link rel="stylesheet" href="/static/auth.css?v=5.1.0">
+</head>
+<body class="auth-page">
+<a class="skip-link" href="#auth-card">Skip to the form</a>
+<div class="auth-shell">
+  <aside class="auth-side">
+    <a class="brand" href="/"><span class="brand-mark" aria-hidden="true">F</span><span class="brand-text">freshcode<i>.ai</i></span></a>
+    <div class="auth-pitch">
+      <p class="eyebrow">AI ENGINEERING RELIABILITY</p>
+      <h1>Generate better code. Spend fewer tokens. <span>Prove it works.</span></h1>
+      <ul class="auth-points">
+        <li><b>Bifrost agent</b> compresses context, generates, tests and repairs, and records real provider token usage.</li>
+        <li><b>Tavily freshness</b> checks technical claims against live sources and flags outdated versions.</li>
+        <li><b>Reproducible evidence</b> in saved runs, benchmarks and exportable reports.</li>
+      </ul>
+    </div>
+    <p class="auth-note">Your projects and runs are private to your account. Provider keys never reach the browser.</p>
+  </aside>
+
+  <main class="auth-main">
+    <section class="auth-card" id="auth-card" aria-labelledby="auth-title">
+      <div class="auth-tabs" role="tablist" aria-label="Account">
+        <button type="button" role="tab" id="tab-signin" aria-selected="true" aria-controls="form-signin">Sign in</button>
+        <button type="button" role="tab" id="tab-signup" aria-selected="false" aria-controls="form-signup">Create account</button>
+      </div>
+      <h2 id="auth-title">Welcome back</h2>
+      <p class="hint" id="auth-sub">Sign in to your workspace.</p>
+      <div class="auth-error" id="auth-error" role="alert" hidden></div>
+
+      <form id="form-signin" class="auth-form" novalidate>
+        <label class="field-label" for="si-email">Email</label>
+        <input id="si-email" class="control" type="email" autocomplete="username" required>
+        <label class="field-label" for="si-password">Password</label>
+        <div class="pw-row"><input id="si-password" class="control" type="password" autocomplete="current-password" required><button type="button" class="btn-sm" data-toggle-pw="si-password" aria-label="Show password">Show</button></div>
+        <button class="btn primary big auth-submit" id="si-submit" type="submit">Sign in</button>
+      </form>
+
+      <form id="form-signup" class="auth-form" novalidate hidden>
+        <label class="field-label" for="su-name">Name <span class="hint">(optional)</span></label>
+        <input id="su-name" class="control" type="text" autocomplete="name" maxlength="80">
+        <label class="field-label" for="su-email">Email</label>
+        <input id="su-email" class="control" type="email" autocomplete="username" required>
+        <label class="field-label" for="su-password">Password</label>
+        <div class="pw-row"><input id="su-password" class="control" type="password" autocomplete="new-password" required aria-describedby="pw-hint"><button type="button" class="btn-sm" data-toggle-pw="su-password" aria-label="Show password">Show</button></div>
+        <p class="hint" id="pw-hint">At least 10 characters. Avoid common passwords. The first account becomes the administrator.</p>
+        <div class="pw-meter" aria-hidden="true"><i id="pw-bar"></i></div><p class="hint" id="pw-label" aria-live="polite">Strength: enter a password</p>
+        <button class="btn primary big auth-submit" id="su-submit" type="submit">Create account</button>
+      </form>
+
+      <div class="auth-alt"><span>or</span></div>
+      <a class="btn big auth-guest" href="/app#demo">Try the guest demo <small>no account · fixtures + real local engine</small></a>
+      <p class="hint auth-foot">By continuing you agree to use this deployment responsibly. <a href="/">Back to the site</a></p>
+    </section>
+  </main>
+</div>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+<script src="/static/auth.js?v=5.1.0"></script>
+</body>
+</html>

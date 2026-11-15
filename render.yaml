@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: freshcode-ai
+    runtime: docker
+    plan: starter
+    healthCheckPath: /api/v1/ready
+    disk: { name: data, mountPath: /data, sizeGB: 1 }
+    envVars:
+      - { key: APP_ENV, value: production }
+      - { key: TRUST_PROXY, value: "1" }
+      - { key: COOKIE_SECURE, value: "1" }
+      - { key: RUNNER_MODE, value: "off" }
+      - { key: DB_PATH, value: /data/freshcode.db }
+      - { key: BIFROST_BASE_URL, sync: false }
+      - { key: BIFROST_API_KEY, sync: false }
+      - { key: BIFROST_MODEL, sync: false }
+      - { key: TAVILY_API_KEY, sync: false }
