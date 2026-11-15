@@ -25,3 +25,12 @@ The image runs as a non-root user, stores the database in `/data` (mount a volum
 6. Provide `BIFROST_*` and `TAVILY_API_KEY` through your platform's secret manager.
 
 `render.yaml` is provided for Render (disk mounted at `/data`).
+
+## Running generated tests on a hosted deployment (opt-in)
+`RUNNER_MODE=off` is the default in `render.yaml`, so the UI reports tests as "Not run - runner disabled". The Docker image includes
+pytest, so `RUNNER_MODE=local` works for Python tasks (JavaScript tests also need Node.js, which the image does not include).
+
+`local` executes model-generated code on the web server and is **not a sandbox**. Only enable it on a private deployment:
+1. Create your admin account first, then set `ALLOW_REGISTRATION=0` so nobody else can sign in.
+2. Set `RUNNER_MODE=local` in the Render dashboard (or in `render.yaml` if the service is managed by the blueprint) and redeploy.
+3. For anything public, use `RUNNER_MODE=docker` on a host that provides a Docker socket instead.
