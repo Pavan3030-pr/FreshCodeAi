@@ -58,7 +58,7 @@ async def post_json(
     timeout: float = 30.0,
     transport=None,
     **kwargs,
-) -> tuple[dict, int]:
+) -> dict:
     """Posts JSON payload to url using httpx (if available) or urllib fallback."""
     headers = headers or {}
     start_t = time.perf_counter()
@@ -66,7 +66,7 @@ async def post_json(
     headers.setdefault("User-Agent", "FreshCodeAi/5.1")
     retries = kwargs.get("retries", None)
 
-    async def _single_post() -> tuple[dict, int]:
+    async def _single_post() -> dict:
         try:
             import httpx
             async with httpx.AsyncClient(timeout=timeout, transport=transport) as client:
@@ -80,7 +80,7 @@ async def post_json(
                         retryable=status_code in RETRYABLE_STATUS,
                     )
                 status.record(service, True, (time.perf_counter() - start_t) * 1000)
-                return res.json(), status_code
+                return res.json()
         except ImportError:
             import json
             import urllib.request
@@ -94,7 +94,7 @@ async def post_json(
                 with urllib.request.urlopen(req, timeout=timeout) as resp:
                     data = json.loads(resp.read().decode("utf-8"))
                     status.record(service, True, (time.perf_counter() - start_t) * 1000)
-                    return data, resp.status
+                    return data
             except urllib.error.HTTPError as exc:
                 body = exc.read().decode("utf-8", errors="replace")
                 raise UpstreamError(
@@ -103,9 +103,9 @@ async def post_json(
                     status_code=exc.code,
                     retryable=exc.code in RETRYABLE_STATUS,
                 )
-            except Exception as exc:
-                status.record(service, False, 0, str(exc))
-                raise UpstreamError(service, str(exc), status_code=500, retryable=True)
+        except Exception as exc:
+            status.record(service, False, 0, str(exc))
+            raise UpstreamError(service, str(exc), status_code=500, retryable=True)
 
     if retries and retries > 1:
         return await retry_async(_single_post, attempts=retries)
