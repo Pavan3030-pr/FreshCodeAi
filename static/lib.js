@@ -133,11 +133,12 @@
     if (!d || d.mode === 'setup_required') { out.extract = { state: 'skipped', msg: 'No generation (Bifrost not configured)' }; ['test', 'diagnose', 'repair', 'final'].forEach(k => { out[k] = { state: 'skipped', msg: 'Not reached' }; }); }
     else {
       out.extract = d.code ? { state: 'done', msg: (d.tests ? 'Code and tests separated' : 'Code extracted, no tests returned') } : { state: 'error', msg: 'No code block in the model reply' };
-      out.test = v.ran ? { state: 'done', msg: `${v.tests_passed} passed · ${v.tests_failed} failed` } : { state: 'skipped', msg: String(v.reason || 'not run').replace(/_/g, ' ') };
+      const off = !!v.blocked && /disabled/i.test(String(v.output || ''));  // runner switched off on this deployment, not a policy violation
+      out.test = v.ran ? (v.blocked ? (off ? { state: 'skipped', msg: 'Not run · runner disabled' } : { state: 'error', msg: 'Blocked by runner policy' }) : { state: 'done', msg: `${v.tests_passed} passed · ${v.tests_failed} failed` }) : { state: 'skipped', msg: String(v.reason || 'not run').replace(/_/g, ' ') };
       const rep = has('repair');
       out.diagnose = rep ? { state: 'done', msg: 'Failure output fed to repair prompt' } : { state: 'skipped', msg: v.ran && v.passed ? 'Not needed, tests passed' : 'Not run' };
       out.repair = rep ? (rep.error ? { state: 'error', msg: rep.error } : { state: 'done', msg: v.repaired ? 'Repair accepted' : 'Repair not accepted' }) : { state: 'skipped', msg: 'Not needed' };
-      out.final = v.ran ? (v.passed ? { state: 'done', msg: 'Tests passed' } : { state: 'error', msg: v.blocked ? 'Blocked by policy' : 'Tests failed' }) : { state: 'skipped', msg: 'No test verification' };
+      out.final = v.ran ? (v.passed ? { state: 'done', msg: 'Tests passed' } : (v.blocked ? (off ? { state: 'skipped', msg: 'Not verified · runner off' } : { state: 'error', msg: 'Blocked by policy' }) : { state: 'error', msg: 'Tests failed' })) : { state: 'skipped', msg: 'No test verification' };
     }
     out.saved = d && d.run_id ? { state: 'done', msg: 'Run #' + d.run_id + ' saved' } : { state: 'skipped', msg: 'Not saved' };
     return out;

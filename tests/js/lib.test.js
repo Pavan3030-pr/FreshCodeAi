@@ -91,3 +91,10 @@ test('finalStages derives stages 6-11 only from real backend fields', () => {
   assert.equal(FC.finalStages({ mode: 'live', code: '' , verification: {} }).extract.state, 'error');
   assert.equal(FC.finalStages({ mode: 'setup_required' }).test.state, 'skipped');
 });
+test('finalStages shows a disabled runner as not run, and a policy block as an error', () => {
+  const off = FC.finalStages({ mode: 'live', code: 'x', tests: 't', run_id: 1, verification: { ran: true, passed: false, blocked: true, tests_passed: 0, tests_failed: 0, output: 'Code execution is disabled on this deployment (set RUNNER_MODE=docker)' }, trace: { spans: [{ name: 'test' }] } });
+  assert.equal(off.test.state, 'skipped'); assert.match(off.test.msg, /runner disabled/);
+  assert.equal(off.final.state, 'skipped'); assert.match(off.final.msg, /runner off/);
+  const pol = FC.finalStages({ mode: 'live', code: 'x', tests: 't', run_id: 1, verification: { ran: true, passed: false, blocked: true, tests_passed: 0, tests_failed: 0, output: "solution.py: import of 'os' is blocked by the runner policy (line 1)" }, trace: { spans: [{ name: 'test' }] } });
+  assert.equal(pol.test.state, 'error'); assert.equal(pol.final.state, 'error'); assert.equal(pol.final.msg, 'Blocked by policy');
+});
