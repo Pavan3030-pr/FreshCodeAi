@@ -24,8 +24,14 @@ class UpstreamError(Exception):
         return f"{self.service} request failed{code}: {str(self)[:200]}"
 
 
-async def retry_async(factory: Callable[[], Awaitable[T]], *, attempts: int = 3, base_delay: float = 0.4,
-                      max_delay: float = 4.0, sleep: Callable[[float], Awaitable[None]] = asyncio.sleep) -> T:
+async def retry_async(
+    factory: Callable[[], Awaitable[T]],
+    *,
+    attempts: int = 3,
+    base_delay: float = 0.4,
+    max_delay: float = 4.0,
+    sleep: Callable[[float], Awaitable[None]] = asyncio.sleep,
+) -> T:
     """Run `factory()` up to attempts+1 times; retry only UpstreamError(retryable=True)."""
     last: Optional[BaseException] = None
     for attempt in range(attempts + 1):
@@ -33,40 +39,60 @@ async def retry_async(factory: Callable[[], Awaitable[T]], *, attempts: int = 3,
             return await factory()
         except UpstreamError as exc:
             last = exc
-            if not exc.retryable or attempt >= attempts:
+            if not exc.retryable or attempt == attempts:
                 raise
-            delay = min(max_delay, base_delay * (2 ** attempt)) * (0.75 + random.random() * 0.5)
-            await sleep(delay)
-    raise last  # pragma: no cover
+            delay = min(max_delay, base_delay * (2**attempt))
+            jitter = random.uniform(0, delay * 0.25)
+            await sleep(delay + jitter)
+        except Exception as exc:
+            raise exc
+    if last:
+        raise last
+    raise RuntimeError("retry loop exited without result or exception")
 
 
-async def post_json(service: str, url: str, *, headers: dict, payload: dict, timeout: float, transport=None,
-                    retries: int = 2) -> tuple[dict, dict]:
-    """POST JSON with retries; returns (json_body, response_headers). Records upstream status."""
-    import httpx  # imported lazily so pure-logic modules stay importable without it
+async def post_json(
+    service: str,
+    url: str,
+    payload: dict,
+    headers: Optional[dict[str, str]] = None,
+    timeout: float = 30.0,
+    transport=None,
+) -> dict:
+    """Issue an async HTTP POST with JSON body and return parsed JSON."""
+    import httpx
 
-    async def once():
-        started = time.perf_counter()
+    start = time.monotonic()
+    req_headers = {"Content-Type": "application/json"}
+    if headers:
+        req_headers.update(headers)
+
+    try:
+        async with httpx.AsyncClient(timeout=timeout, transport=transport, follow_redirects=True) as client:
+            response = await client.post(url, json=payload, headers=req_headers)
+    except httpx.TimeoutException as exc:
+        elapsed = (time.monotonic() - start) * 1000
+        status.record(service, False, elapsed, "timeout")
+        raise UpstreamError(service, "request timed out", retryable=True) from exc
+    except httpx.RequestError as exc:
+        elapsed = (time.monotonic() - start) * 1000
+        status.record(service, False, elapsed, str(exc))
+        raise UpstreamError(service, f"network error: {exc}", retryable=True) from exc
+
+    elapsed = (time.monotonic() - start) * 1000
+
+    if response.status_code >= 400:
+        status.record(service, False, elapsed, f"HTTP {response.status_code}")
+        err_detail = ""
         try:
-            async with httpx.AsyncClient(timeout=timeout, transport=transport) as client:
-                response = await client.post(url, headers=headers, json=payload)
-        except httpx.TimeoutException as exc:
-            status.record(service, False, (time.perf_counter() - started) * 1000, "timeout")
-            raise UpstreamError(service, "timed out", retryable=True) from exc
-        except httpx.HTTPError as exc:
-            status.record(service, False, (time.perf_counter() - started) * 1000, type(exc).__name__)
-            raise UpstreamError(service, f"network error ({type(exc).__name__})", retryable=True) from exc
-        elapsed = (time.perf_counter() - started) * 1000
-        if response.status_code >= 400:
-            status.record(service, False, elapsed, f"HTTP {response.status_code}")
-            raise UpstreamError(service, "upstream returned an error", response.status_code,
-                                retryable=response.status_code in RETRYABLE_STATUS)
-        try:
-            body = response.json()
-        except ValueError as exc:
-            status.record(service, False, elapsed, "invalid JSON")
-            raise UpstreamError(service, "returned invalid JSON", response.status_code) from exc
-        status.record(service, True, elapsed)
-        return body, dict(response.headers)
+            err_detail = response.text[:200]
+        except Exception:
+            pass
+        msg = f"upstream returned an error: {err_detail}" if err_detail else "upstream returned an error"
+        raise UpstreamError(service, msg, response.status_code, retryable=response.status_code in RETRYABLE_STATUS)
 
-    return await retry_async(once, attempts=retries)
+    status.record(service, True, elapsed, "200 OK")
+    try:
+        return response.json()
+    except ValueError as exc:
+        raise UpstreamError(service, "invalid JSON returned from upstream") from exc
