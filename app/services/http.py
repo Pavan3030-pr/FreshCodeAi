@@ -31,9 +31,11 @@ async def retry_async(
     base_delay: float = 0.4,
     max_delay: float = 4.0,
     is_retryable: Optional[Callable[[Exception], bool]] = None,
+    sleep: Optional[Callable[[float], Awaitable[None]]] = None,
 ) -> T:
     """Executes factory() up to attempts times using exponential backoff + jitter."""
     last_exc: Optional[Exception] = None
+    sleep_fn = sleep or asyncio.sleep
     for attempt in range(1, attempts + 1):
         try:
             return await factory()
@@ -44,7 +46,7 @@ async def retry_async(
                 raise
             delay = min(max_delay, base_delay * (2 ** (attempt - 1)))
             jitter = random.uniform(0, delay * 0.2)
-            await asyncio.sleep(delay + jitter)
+            await sleep_fn(delay + jitter)
     if last_exc:
         raise last_exc
     raise RuntimeError("retry_async failed without exception")
