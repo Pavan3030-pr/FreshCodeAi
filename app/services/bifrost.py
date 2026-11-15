@@ -1,12 +1,23 @@
+"""Bifrost LLM Gateway Client."""
+from __future__ import annotations
 
 from app.config import settings
 from app.services.cache import TTLCache, make_key
 from app.services.http import UpstreamError, post_json
 
-_CACHE = TTLCache(ttl_seconds=settings.cache_ttl_seconds, maxsize=128)
+_CACHE = TTLCache(ttl_seconds=getattr(settings, "cache_ttl_seconds", 300), maxsize=128)
 
 
-def provider_input_tokens(usage) -> "int | None":
+def _normalize_base_url(url: str) -> str:
+    url = (url or "").strip().rstrip("/")
+    if url in ("https://groq.com", "http://groq.com", "https://api.groq.com", "http://api.groq.com"):
+        return "https://api.groq.com/openai/v1"
+    if url.endswith("/chat/completions"):
+        url = url[:-17].rstrip("/")
+    return url
+
+
+def provider_input_tokens(usage) -> int | None:
     """Provider-reported prompt tokens, or None when the gateway omitted usage."""
     usage = usage or {}
     value = usage.get("prompt_tokens")
@@ -18,22 +29,18 @@ def provider_input_tokens(usage) -> "int | None":
 class BifrostClient:
     def __init__(self, api_key=None, base_url=None, model=None, transport=None, retries=None, fallback_model=None):
         self.api_key = settings.bifrost_api_key if api_key is None else api_key
-        self.base_url = (base_url or settings.bifrost_base_url).rstrip("/")
+        self.base_url = _normalize_base_url(base_url or settings.bifrost_base_url)
         self.model = model or settings.bifrost_model
-        self.fallback_model = settings.bifrost_fallback_model if fallback_model is None else fallback_model
+        self.fallback_model = getattr(settings, "bifrost_fallback_model", None) if fallback_model is None else fallback_model
         self.transport = transport
-        self.retries = settings.upstream_retries if retries is None else retries
+        self.retries = getattr(settings, "upstream_retries", 3) if retries is None else retries
 
     @property
-    def configured(self):
+    def configured(self) -> bool:
         return bool(self.api_key)
 
     async def complete(self, system_prompt: str, user_prompt: str, *, use_cache: bool = False, max_tokens=None, model=None):
-        """Chat completion. use_cache=True serves identical prompts from memory (0 new tokens).
-
-        `model` overrides the default (model routing). If the call fails with a retryable/server/model error and
-        BIFROST_FALLBACK_MODEL is set, one attempt is made on the fallback model; the result says so.
-        """
+        """Chat completion. use_cache=True serves identical prompts from memory (0 new tokens)."""
         if not self.configured:
             return {"configured": False, "content": "", "usage": {}, "message": "Bifrost is not configured. Add BIFROST_API_KEY and BIFROST_MODEL to .env."}
         chosen = model or self.model
@@ -52,19 +59,34 @@ class BifrostClient:
             hit = _CACHE.get(key)
             if hit is not None:
                 return {**hit, "cached": True, "usage": {}, "original_usage": hit.get("usage", {})}
-        payload = {"model": model, "temperature": 0.1,
-                   "max_tokens": int(max_tokens or settings.max_output_tokens),
-                   "messages": [{"role": "system", "content": system_prompt}, {"role": "user", "content": user_prompt}]}
-        data, headers = await post_json(
-            "bifrost", f"{self.base_url}/chat/completions",
-            headers={"Authorization": f"Bearer {self.api_key}", "Content-Type": "application/json"},
-            payload=payload, timeout=settings.timeout_seconds, transport=self.transport, retries=self.retries)
+        max_tok = max_tokens or getattr(settings, "max_output_tokens", 4096)
+        payload = {
+            "model": model,
+            "temperature": 0.1,
+            "max_tokens": max_tok,
+            "messages": [{"role": "system", "content": system_prompt}, {"role": "user", "content": user_prompt}],
+        }
+        timeout_val = getattr(settings, "bifrost_timeout", 120.0)
+        data = await post_json(
+            "bifrost",
+            f"{self.base_url}/chat/completions",
+            payload=payload,
+            headers={"Authorization": f"Bearer {self.api_key}"},
+            timeout=timeout_val,
+            transport=self.transport,
+        )
         choices = data.get("choices") or []
         if not choices:
             raise UpstreamError("bifrost", "response contained no choices")
         content = (choices[0].get("message") or {}).get("content") or ""
-        result = {"configured": True, "content": content, "usage": data.get("usage") or {},
-                  "model": data.get("model", model), "request_id": headers.get("x-request-id"), "cached": False}
+        result = {
+            "configured": True,
+            "content": content,
+            "usage": data.get("usage") or {},
+            "model": data.get("model", model),
+            "request_id": data.get("id", ""),
+            "cached": False,
+        }
         if use_cache and content:
             _CACHE.set(key, result)
         return result
