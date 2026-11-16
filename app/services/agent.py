@@ -153,7 +153,7 @@ async def build_solution(payload, bifrost=None, tavily=None, on_progress=None):
     with trace.span("generate", model=getattr(llm, "model", None)) as a:
         result = await llm.complete(SYSTEM_PROMPT, prompt, use_cache=True)
         a.update(cached=bool(result.get("cached")), provider_input_tokens=provider_input_tokens(result.get("usage")), model=result.get("model"),
-                 fallback_used=bool(result.get("fallback_used")))
+                 fallback_used=bool(result.get("fallback_used")), routing=result.get("routing") or None)
     calls += 1
     usages.append(result.get("usage", {}))
     answer = result.get("content", "")
@@ -206,6 +206,6 @@ async def build_solution(payload, bifrost=None, tavily=None, on_progress=None):
     token_report.update({"provider_input_tokens": provider_in, "llm_calls": calls, "cache_hit": cache_hit})
     return {"mode": "live", "answer": answer, "code": code, "tests": tests, "verification": verification,
             "estimated_input_tokens": estimated_input, "provider_usage": usage, "token_report": token_report, "trace": trace.to_dict(),
-            "compression": comp, "model": result.get("model"), "request_id": result.get("request_id"), "sources": sources,
+            "compression": comp, "model": result.get("model"), "request_id": result.get("request_id"), "routing": result.get("routing") or {}, "sources": sources,
             "research_configured": searcher.configured, "research_error": research_error, "research_meta": research_meta,
             "latency_ms": round((time.perf_counter() - started) * 1000)}

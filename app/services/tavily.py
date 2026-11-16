@@ -7,6 +7,38 @@ from app.services.http import post_json
 _CACHE = TTLCache(ttl_seconds=settings.cache_ttl_seconds, maxsize=256)
 
 
+_DEPTHS = {"basic", "advanced"}
+_TOPICS = {"general", "news"}
+_RANGES = {"day", "week", "month", "year"}
+
+
+def _domains(values, limit):
+    out = []
+    for v in values or ():
+        d = str(v).strip().lower().removeprefix("https://").removeprefix("http://").strip("/")
+        if d and "/" not in d and d not in out:
+            out.append(d)
+    return out[:limit]
+
+
+def build_search_payload(query: str, max_results: int = 4, cfg=None) -> dict:
+    """Tavily request body. Defaults match the original behaviour; env settings add depth, topic, freshness window and domain filters."""
+    cfg = cfg or settings  # resolved at call time so configuration changes apply
+    depth = cfg.tavily_search_depth if cfg.tavily_search_depth in _DEPTHS else "basic"
+    payload = {"query": query[:500], "search_depth": depth, "max_results": max(1, min(max_results, 8)),
+               "include_answer": False, "include_raw_content": False}
+    if cfg.tavily_topic in _TOPICS and cfg.tavily_topic != "general":
+        payload["topic"] = cfg.tavily_topic
+    if cfg.tavily_time_range in _RANGES:
+        payload["time_range"] = cfg.tavily_time_range
+    include, exclude = _domains(cfg.tavily_include_domains, 300), _domains(cfg.tavily_exclude_domains, 150)
+    if include:
+        payload["include_domains"] = include
+    if exclude:
+        payload["exclude_domains"] = [d for d in exclude if d not in include]
+    return payload
+
+
 class TavilyClient:
     def __init__(self, api_key=None, transport=None, retries=None):
         self.api_key = settings.tavily_api_key if api_key is None else api_key
@@ -20,8 +52,7 @@ class TavilyClient:
     async def search(self, query: str, max_results: int = 4):
         if not self.configured:
             return {"configured": False, "results": [], "message": "Tavily API key is not configured. Add TAVILY_API_KEY to .env."}
-        payload = {"query": query[:500], "search_depth": "basic", "max_results": max(1, min(max_results, 8)),
-                   "include_answer": False, "include_raw_content": False}
+        payload = build_search_payload(query, max_results)
         key = make_key("tavily", payload)
         hit = _CACHE.get(key)
         if hit is not None:
@@ -44,6 +75,6 @@ class TavilyClient:
                             "content": str(item.get("content") or "")[:1800], "score": relevance,
                             "relevance": relevance, "published_date": item.get("published_date")})
         out = {"configured": True, "results": results, "response_time": data.get("response_time"),
-               "request_id": data.get("request_id"), "cached": False}
+               "request_id": data.get("request_id"), "cached": False, "search_depth": payload["search_depth"]}
         _CACHE.set(key, out)
         return out

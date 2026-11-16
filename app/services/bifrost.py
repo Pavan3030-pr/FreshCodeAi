@@ -1,6 +1,8 @@
 """Bifrost LLM Gateway Client."""
 from __future__ import annotations
 
+import uuid
+
 from app.config import settings
 from app.services.cache import TTLCache, make_key
 from app.services.http import UpstreamError, post_json
@@ -24,6 +26,24 @@ def provider_input_tokens(usage) -> int | None:
     if value is None:
         value = usage.get("input_tokens")
     return int(value) if isinstance(value, (int, float)) and not isinstance(value, bool) and value >= 0 else None
+
+
+def parse_routing(headers) -> dict:
+    """Which provider/model actually served the call, per the x-bifrost-* response headers Bifrost adds (empty for other gateways)."""
+    h = {str(k).lower(): str(v) for k, v in (headers or {}).items()}
+    out = {}
+    for key, name in (("x-bifrost-routing-info-provider", "provider"), ("x-bifrost-routing-info-model", "model")):
+        if h.get(key):
+            out[name] = h[key][:80]
+    for key, name in (("x-bifrost-fallback-index", "fallback_index"), ("x-bifrost-upstream-latency-ms", "upstream_latency_ms")):
+        try:
+            out[name] = int(float(h[key]))
+        except (KeyError, ValueError):
+            pass
+    cache = {k[len("x-bifrost-cache-"):]: v[:80] for k, v in h.items() if k.startswith("x-bifrost-cache-")}
+    if cache:
+        out["cache"] = cache
+    return out
 
 
 class BifrostClient:
@@ -66,12 +86,20 @@ class BifrostClient:
             "max_tokens": max_tok,
             "messages": [{"role": "system", "content": system_prompt}, {"role": "user", "content": user_prompt}],
         }
+        # Server-side failover (Bifrost "fallbacks" array, provider/model strings). Opt-in: plain OpenAI-compatible providers reject unknown fields.
+        native = getattr(settings, "bifrost_native_fallbacks", False)
+        if native and self.fallback_model and "/" in self.fallback_model and self.fallback_model != model:
+            payload["fallbacks"] = [self.fallback_model]
+        req_headers = {"Authorization": f"Bearer {self.api_key}", "x-request-id": f"fc-{uuid.uuid4().hex[:16]}"}  # correlates with Bifrost logs
+        vk = getattr(settings, "bifrost_virtual_key", "")
+        if vk:
+            req_headers["x-bf-vk"] = vk
         timeout_val = getattr(settings, "bifrost_timeout", 120.0)
         data, resp_headers = await post_json(
             "bifrost",
             f"{self.base_url}/chat/completions",
             payload=payload,
-            headers={"Authorization": f"Bearer {self.api_key}"},
+            headers=req_headers,
             timeout=timeout_val,
             transport=self.transport,
             retries=self.retries,
@@ -85,9 +113,14 @@ class BifrostClient:
             "content": content,
             "usage": data.get("usage") or {},
             "model": data.get("model", model),
-            "request_id": resp_headers.get("x-request-id") or data.get("id", ""),
+            "request_id": resp_headers.get("x-bifrost-request-id") or resp_headers.get("x-request-id") or data.get("id", ""),
             "cached": False,
         }
+        routing = parse_routing(resp_headers)
+        if routing:
+            result["routing"] = routing
+            if (routing.get("fallback_index") or 0) > 0:
+                result["fallback_used"] = True
         if use_cache and content:
             _CACHE.set(key, result)
         return result

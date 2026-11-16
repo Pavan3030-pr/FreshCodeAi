@@ -60,6 +60,11 @@ def _float(name: str, default: float, min_val: float = None, max_val: float = No
     return val
 
 
+def _csv(name: str) -> tuple:
+    """Comma-separated env value -> tuple of non-empty, stripped items."""
+    return tuple(p.strip() for p in _env(name).split(",") if p.strip())
+
+
 def _bool(name: str, default: bool) -> bool:
     raw = os.getenv(name, None)
     if raw is None or _clean(raw) == "":
@@ -101,6 +106,15 @@ class Settings:
     price_in_per_mtok: float = _float("PRICE_INPUT_PER_MTOK", 0, 0, 1000)
     price_out_per_mtok: float = _float("PRICE_OUTPUT_PER_MTOK", 0, 0, 1000)
     tavily_api_key: str = _env("TAVILY_API_KEY")
+    # Tavily search tuning (all optional; defaults reproduce the previous behaviour)
+    tavily_search_depth: str = _env("TAVILY_SEARCH_DEPTH", "basic").lower()  # basic | advanced (advanced costs more credits, better snippets)
+    tavily_topic: str = _env("TAVILY_TOPIC", "general").lower()  # general | news
+    tavily_time_range: str = _env("TAVILY_TIME_RANGE", "").lower()  # "" | day | week | month | year (freshness window)
+    tavily_include_domains: tuple = _csv("TAVILY_INCLUDE_DOMAINS")  # e.g. docs.python.org,fastapi.tiangolo.com
+    tavily_exclude_domains: tuple = _csv("TAVILY_EXCLUDE_DOMAINS")
+    # Bifrost gateway options (use with a real Bifrost gateway; harmless defaults otherwise)
+    bifrost_virtual_key: str = _env("BIFROST_VIRTUAL_KEY")  # sent as x-bf-vk for governance, budgets and routing rules
+    bifrost_native_fallbacks: bool = _bool("BIFROST_NATIVE_FALLBACKS", False)  # let Bifrost fail over server-side via the request "fallbacks" array
     max_search_results: int = _int("MAX_SEARCH_RESULTS", 4, 1, 8)
     timeout_seconds: float = _float("REQUEST_TIMEOUT_SECONDS", 25, 3, 120)
     max_execution_sec: int = _int("MAX_EXECUTION_SEC", 120, 10, 600)

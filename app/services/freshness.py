@@ -95,6 +95,17 @@ def _product_terms(claim: str, version: str) -> tuple[list[str], str]:
     return [w.lower() for w in words], " ".join(words)
 
 
+_FILLER_WORDS = {"version", "versions", "ver", "v", "release", "released", "releases", "is", "now", "at", "latest", "stable", "to", "the", "of", "in",
+                 "current", "currently", "as", "was", "edition", "update", "updated", "upgrade", "upgraded", "available", "build", "and", "or"}
+
+
+def _names_product(window: str, product: list) -> bool:
+    """True when the product is the name nearest to the version, so "FastAPI 0.133 adds Starlette 1.0" is not read as FastAPI 1.0."""
+    words = [w for w in re.findall(r"[a-z0-9][a-z0-9.+#_-]*", window) if w not in _FILLER_WORDS and not re.fullmatch(r"v?\d[\d.]*", w)]
+    nearest = " ".join(words[-max(1, len(product)):])
+    return all(term in nearest for term in product)
+
+
 def detect_version_drift(claim: str, sources: list[dict]) -> dict:
     """Deterministic: flag when a source mentions the same product at a NEWER version than the claim."""
     claimed = VERSION_RE.findall(claim)
@@ -117,7 +128,7 @@ def detect_version_drift(claim: str, sources: list[dict]) -> dict:
         low = text.lower()
         for m in VERSION_RE.finditer(text):
             window = low[max(0, m.start() - 48): m.start()]
-            if not all(term in window for term in product):
+            if not all(term in window for term in product) or not _names_product(window, product):
                 continue
             if PRERELEASE_RE.match(text[m.end(): m.end() + 16]):
                 continue  # beta / rc / preview builds are not "the latest stable"

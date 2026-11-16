@@ -6,7 +6,8 @@ from pathlib import Path
 # Hermetic: a developer's local .env must never change test behaviour (load_dotenv does not override existing vars).
 for key, value in {"APP_ENV": "development", "ENABLE_TEST_RUNNER": "1", "APP_ACCESS_TOKEN": "", "BIFROST_API_KEY": "",
                    "TAVILY_API_KEY": "", "TRUST_PROXY": "0", "RATE_LIMIT_PER_MINUTE": "10000", "HEAVY_RATE_LIMIT_PER_MINUTE": "1000",
-                   "CACHE_TTL_SECONDS": "900", "DB_PATH": str(Path(tempfile.gettempdir()) / "freshcode-tests.db")}.items():
+                   "CACHE_TTL_SECONDS": "900", "TAVILY_SEARCH_DEPTH": "basic", "TAVILY_TOPIC": "general", "TAVILY_TIME_RANGE": "",
+                   "TAVILY_INCLUDE_DOMAINS": "", "TAVILY_EXCLUDE_DOMAINS": "", "BIFROST_VIRTUAL_KEY": "", "BIFROST_NATIVE_FALLBACKS": "0", "DB_PATH": str(Path(tempfile.gettempdir()) / "freshcode-tests.db")}.items():
     os.environ[key] = value
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import importlib.util  # noqa: E402

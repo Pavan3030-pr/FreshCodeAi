@@ -1,8 +1,19 @@
 name: ci
-on: [push, pull_request]
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 6 * * 1"   # weekly: catches new dependency advisories even when nobody pushes
+permissions:
+  contents: read
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
   test:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -14,6 +25,7 @@ jobs:
       - run: node --test tests/js/lib.test.js tests/js/dom.test.js tests/js/landing.test.js
   e2e:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     needs: test
     steps:
       - uses: actions/checkout@v4
@@ -28,15 +40,25 @@ jobs:
         with: { name: e2e-screenshots, path: e2e-shots }
   security:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
-        with: { python-version: "3.12" }
+        with: { python-version: "3.12", cache: pip, cache-dependency-path: requirements.txt }
       - run: pip install pip-audit && pip-audit -r requirements.txt
   docker:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
       - run: docker build -t freshcode-ai .
       - run: docker build -f runner/Dockerfile -t freshcode-runner:latest runner
-      - run: docker run -d --name app -p 8000:8000 -e RUNNER_MODE=off freshcode-ai && sleep 6 && curl -fsS http://localhost:8000/api/v1/ready
+      - name: Start the container and wait until it is ready
+        run: |
+          docker run -d --name app -p 8000:8000 -e RUNNER_MODE=off freshcode-ai
+          for i in $(seq 1 30); do
+            curl -fsS http://localhost:8000/api/v1/ready && exit 0
+            sleep 2
+          done
+          docker logs app
+          exit 1
